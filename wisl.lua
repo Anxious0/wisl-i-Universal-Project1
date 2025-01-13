@@ -1,6 +1,6 @@
 local function autoLoadScript()
     local success, result = pcall(function()
-        loadstring(game:HttpGet("loadstring(game:HttpGet("https://raw.githubusercontent.com/wisl884/wisl-i-Universal-Project1/adb8b68c7ce760069192d557859f488f2502ccc5/Wisl'i%20Universal%20Project"))()"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/wisl884/wisl-i-Universal-Project1/refs/heads/main/wisl.lua"))() 
     end)
  
     game.Players.PlayerRemoving:Connect(function(player)
@@ -8,12 +8,12 @@ local function autoLoadScript()
             if syn then
                 syn.queue_on_teleport([[
                     wait(1)
-                    loadstring(game:HttpGet("loadstring(game:HttpGet("https://raw.githubusercontent.com/wisl884/wisl-i-Universal-Project1/adb8b68c7ce760069192d557859f488f2502ccc5/Wisl'i%20Universal%20Project"))()"))()
+                    loadstring(game:HttpGet("https://raw.githubusercontent.com/wisl884/wisl-i-Universal-Project1/refs/heads/main/wisl.lua"))() 
                 ]])
             else
                 queue_on_teleport([[
                     wait(1)
-                    loadstring(game:HttpGet("loadstring(game:HttpGet("https://raw.githubusercontent.com/wisl884/wisl-i-Universal-Project1/adb8b68c7ce760069192d557859f488f2502ccc5/Wisl'i%20Universal%20Project"))()"))()
+                    loadstring(game:HttpGet("https://raw.githubusercontent.com/wisl884/wisl-i-Universal-Project1/refs/heads/main/wisl.lua"))() 
                 ]])
             end
         end
