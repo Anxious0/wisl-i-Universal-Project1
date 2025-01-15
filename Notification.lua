@@ -17,7 +17,7 @@ uiCorner.Parent = backgroundFrame
 
 local textLabel = Instance.new("TextLabel")
 textLabel.Name = "NotificationText"
-textLabel.Size = UDim2.new(1, -20, 1, -20)
+textLabel.Size = UDim2.new(1, -20, 1, -20) 
 textLabel.Position = UDim2.new(0, 10, 0, 10)
 textLabel.BackgroundTransparency = 1
 textLabel.Text = "Welcome to Universal Project!"
@@ -26,7 +26,17 @@ textLabel.Font = Enum.Font.GothamBold
 textLabel.TextScaled = true 
 textLabel.Parent = backgroundFrame
 
+local sound = Instance.new("Sound")
+sound.Name = "NotificationSound"
+sound.SoundId = "rbxassetid://6026984224"
+sound.Volume = 1
+sound.Parent = backgroundFrame
+
 local function showNotification(duration)
+
+    sound:Play()
+    
+
     backgroundFrame:TweenSizeAndPosition(
         UDim2.new(0.5, 0, 0.2, 0), 
         UDim2.new(0.25, 0, 0.4, 0), 
@@ -40,7 +50,10 @@ local function showNotification(duration)
         backgroundFrame.BackgroundTransparency = backgroundFrame.BackgroundTransparency - 0.1
         wait(0.05)
     end
+    
     wait(duration) 
+    
+ 
     for i = 1, 10 do
         backgroundFrame.BackgroundTransparency = backgroundFrame.BackgroundTransparency + 0.1
         wait(0.05)
