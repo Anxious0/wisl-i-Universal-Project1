@@ -1,0 +1,159 @@
+        local Players = game:GetService("Players")
+        local player = Players.LocalPlayer
+        local UserInputService = game:GetService("UserInputService")
+        
+        local function createGUI()
+            local ScreenGui = Instance.new("ScreenGui")
+            ScreenGui.Name = "SimpleFakeLagGUI"
+            ScreenGui.Parent = game.CoreGui
+            
+
+            local mainFrame = Instance.new("Frame")
+            mainFrame.Size = UDim2.new(0, 180, 0, 200) 
+            mainFrame.Position = UDim2.new(0.5, -90, 0.5, -100)
+            mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+            mainFrame.Parent = ScreenGui
+            
+            local corner = Instance.new("UICorner")
+            corner.CornerRadius = UDim.new(0, 8)
+            corner.Parent = mainFrame
+            
+
+            local toggleButton = Instance.new("TextButton")
+            toggleButton.Size = UDim2.new(0.8, 0, 0, 40)
+            toggleButton.Position = UDim2.new(0.1, 0, 0.1, 0)
+            toggleButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+            toggleButton.Text = "🔄 FakeLag: OFF"
+            toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            toggleButton.Font = Enum.Font.GothamBold
+            toggleButton.TextSize = 14
+            toggleButton.Parent = mainFrame
+            
+            local buttonCorner = Instance.new("UICorner")
+            buttonCorner.CornerRadius = UDim.new(0, 6)
+            buttonCorner.Parent = toggleButton
+            
+
+            local waitInput = Instance.new("TextBox")
+            waitInput.Size = UDim2.new(0.8, 0, 0, 25)
+            waitInput.Position = UDim2.new(0.1, 0, 0.4, 0)
+            waitInput.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+            waitInput.Text = "0.05"
+            waitInput.PlaceholderText = "Wait Time"
+            waitInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+            waitInput.Font = Enum.Font.GothamBold
+            waitInput.TextSize = 14
+            waitInput.Parent = mainFrame
+            
+            local waitCorner = Instance.new("UICorner")
+            waitCorner.CornerRadius = UDim.new(0, 6)
+            waitCorner.Parent = waitInput
+            
+
+            local delayInput = Instance.new("TextBox")
+            delayInput.Size = UDim2.new(0.8, 0, 0, 25)
+            delayInput.Position = UDim2.new(0.1, 0, 0.6, 0)
+            delayInput.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+            delayInput.Text = "0.4"
+            delayInput.PlaceholderText = "Delay Time"
+            delayInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+            delayInput.Font = Enum.Font.GothamBold
+            delayInput.TextSize = 14
+            delayInput.Parent = mainFrame
+            
+            local delayCorner = Instance.new("UICorner")
+            delayCorner.CornerRadius = UDim.new(0, 6)
+            delayCorner.Parent = delayInput
+            
+
+            local closeButton = Instance.new("TextButton")
+            closeButton.Size = UDim2.new(0.8, 0, 0, 25)
+            closeButton.Position = UDim2.new(0.1, 0, 0.8, 0)
+            closeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+            closeButton.Text = "❌ Close"
+            closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            closeButton.Font = Enum.Font.GothamBold
+            closeButton.TextSize = 14
+            closeButton.Parent = mainFrame
+            
+            local closeCorner = Instance.new("UICorner")
+            closeCorner.CornerRadius = UDim.new(0, 6)
+            closeCorner.Parent = closeButton
+            
+            local FakeLag = false
+            local waitTime = 0.05
+            local delayTime = 0.4
+            
+
+            waitInput.FocusLost:Connect(function()
+                waitTime = tonumber(waitInput.Text) or waitTime
+            end)
+            
+            delayInput.FocusLost:Connect(function()
+                delayTime = tonumber(delayInput.Text) or delayTime
+            end)
+            
+
+            toggleButton.MouseButton1Click:Connect(function()
+                FakeLag = not FakeLag
+                toggleButton.Text = "🔄 FakeLag: " .. (FakeLag and "ON" or "OFF")
+                toggleButton.BackgroundColor3 = FakeLag and Color3.fromRGB(60, 170, 60) or Color3.fromRGB(45, 45, 45)
+            end)
+            
+
+            closeButton.MouseButton1Click:Connect(function()
+                ScreenGui:Destroy()
+            end)
+            
+            coroutine.wrap(function()
+                while wait(waitTime) do
+                    if FakeLag then
+                        local character = player.Character
+                        if character and character:FindFirstChild("HumanoidRootPart") then
+                            character.HumanoidRootPart.Anchored = true
+                            wait(delayTime)
+                            character.HumanoidRootPart.Anchored = false
+                        end
+                    end
+                end
+            end)()
+            
+
+            local dragging = false
+            local dragInput, dragStart, startPos
+            
+            mainFrame.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    dragging = true
+                    dragStart = input.Position
+                    startPos = mainFrame.Position
+                end
+            end)
+            
+            mainFrame.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    dragging = false
+                end
+            end)
+            
+            UserInputService.InputChanged:Connect(function(input)
+                if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                    local delta = input.Position - dragStart
+                    mainFrame.Position = UDim2.new(
+                        startPos.X.Scale,
+                        startPos.X.Offset + delta.X,
+                        startPos.Y.Scale,
+                        startPos.Y.Offset + delta.Y
+                    )
+                end
+            end)
+        end
+        
+        player.CharacterAdded:Connect(function()
+            if game.CoreGui:FindFirstChild("SimpleFakeLagGUI") then
+                game.CoreGui.SimpleFakeLagGUI:Destroy()
+            end
+            createGUI()
+        end)
+        
+        createGUI()
