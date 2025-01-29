@@ -1,29 +1,62 @@
--- Not Sure
+local targetRemoteName = "Remote" 
+local blockedEventArgument = "Gamer" 
 
-local Remote;
-game.ChildAdded:Connect(function(Obj)
-  Remote = Obj
+local function safeDisableConnections(instance, signalName)
+    pcall(function()
+        for _, connection in ipairs(getconnections(instance[signalName])) do
+            connection:Disable()
+        end
+    end)
+end
+
+local function setupRemoteProtection()
+    local detectedRemote = game:WaitForChild(targetRemoteName, 10)
+    if not detectedRemote then
+        warn("Target remote not found within 10 seconds")
+        return
+    end
+
+    local originalNamecall
+    originalNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+        local args = {...}
+        if self == detectedRemote and args[1] == blockedEventArgument then
+            return task.wait(9e9) 
+        end
+        return originalNamecall(self, ...)
+    end)
+end
+
+local function setupSpeedProtection()
+    local character = game.Players.LocalPlayer.Character
+    if not character then return end
+
+    local handler = character:WaitForChild("CharacterHandler", 5)
+    if not handler then return end
+
+    local stats = handler:WaitForChild("Stats", 3)
+    if stats then
+        safeDisableConnections(stats.Walkspeed, "Changed")
+        
+
+        stats.Walkspeed.Value = 16
+        setupreadonly(stats.Walkspeed, true)
+    end
+end
+
+local function setupFallDamageProtection()
+    local success, env = pcall(getsenv, game.Players.LocalPlayer.Character:WaitForChild("CharacterHandler").LocalScript)
+    if success and env.Fall_Damage then
+        env.Fall_Damage = function() end
+        setupreadonly(env, true) 
+    end
+end
+
+task.spawn(setupRemoteProtection)
+task.spawn(setupSpeedProtection)
+task.spawn(setupFallDamageProtection)
+
+game.Players.LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(1) 
+    setupSpeedProtection()
+    setupFallDamageProtection()
 end)
-
-local oldnamecall; oldnamecall = hookmetamethod(game, "__namecall", function(self, ...)
-  local args = {...}
- 
-  if Remote then
-      if self.Name == Remote.Name then
-          if args[1] == "Gamer" then
-              return wait(9e9)
-          end
-      end
-  end
- 
-  return oldnamecall(self, unpack(args))
-end)
-
-for i, v in pairs(getconnections(game.Players.LocalPlayer.Character.CharacterHandler.Stats.Walkspeed.Changed)) do
-  v:Disable()
-end    
-
-
-local x = getsenv(game.Players.LocalPlayer.Character:WaitForChild("CharacterHandler").LocalScript)
-
-x.Fall_Damage = function() end
