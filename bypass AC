@@ -1,0 +1,29 @@
+-- Not Sure
+
+local Remote;
+game.ChildAdded:Connect(function(Obj)
+  Remote = Obj
+end)
+
+local oldnamecall; oldnamecall = hookmetamethod(game, "__namecall", function(self, ...)
+  local args = {...}
+ 
+  if Remote then
+      if self.Name == Remote.Name then
+          if args[1] == "Gamer" then
+              return wait(9e9)
+          end
+      end
+  end
+ 
+  return oldnamecall(self, unpack(args))
+end)
+
+for i, v in pairs(getconnections(game.Players.LocalPlayer.Character.CharacterHandler.Stats.Walkspeed.Changed)) do
+  v:Disable()
+end    
+
+
+local x = getsenv(game.Players.LocalPlayer.Character:WaitForChild("CharacterHandler").LocalScript)
+
+x.Fall_Damage = function() end
