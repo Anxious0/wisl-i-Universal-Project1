@@ -1,84 +1,5 @@
-local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-
-local targetRemoteName = "Remote"
-local blockedEventArgument = "Gamer"
-local FLYING_SPEED = 50
-local TWEEN_SPEED = 100
-
-
-local function enableFlying()
-    local player = Players.LocalPlayer
-    local character = player.Character
-    if not character then return end
-    
-    local humanoid = character:FindFirstChild("Humanoid")
-    local hrp = character:FindFirstChild("HumanoidRootPart")
-    if not (humanoid and hrp) then return end
-    
-    local flyPart = Instance.new("BodyVelocity")
-    flyPart.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-    flyPart.Velocity = Vector3.new(0, 0, 0)
-    flyPart.Parent = hrp
-    
-    local flying = true
-    
-    RunService:BindToRenderStep("Flying", 1, function()
-        if not flying then return end
-        local moveDirection = Vector3.new()
-        
-        if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-            moveDirection = moveDirection + (workspace.CurrentCamera.CFrame.LookVector * FLYING_SPEED)
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.S) then
-            moveDirection = moveDirection - (workspace.CurrentCamera.CFrame.LookVector * FLYING_SPEED)
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.A) then
-            moveDirection = moveDirection - (workspace.CurrentCamera.CFrame.RightVector * FLYING_SPEED)
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.D) then
-            moveDirection = moveDirection + (workspace.CurrentCamera.CFrame.RightVector * FLYING_SPEED)
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
-            moveDirection = moveDirection + Vector3.new(0, FLYING_SPEED, 0)
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
-            moveDirection = moveDirection - Vector3.new(0, FLYING_SPEED, 0)
-        end
-        
-        flyPart.Velocity = moveDirection
-    end)
-    
-    return function()
-        flying = false
-        RunService:UnbindFromRenderStep("Flying")
-        if flyPart then flyPart:Destroy() end
-    end
-end
-
-
-local function tweenToPosition(position)
-    local player = Players.LocalPlayer
-    local character = player.Character
-    if not character then return end
-    
-    local hrp = character:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
-    
-    local distance = (hrp.Position - position).Magnitude
-    local tweenInfo = TweenInfo.new(
-        distance/TWEEN_SPEED,
-        Enum.EasingStyle.Linear,
-        Enum.EasingDirection.Out
-    )
-    
-    local tween = TweenService:Create(hrp, tweenInfo, {CFrame = CFrame.new(position)})
-    tween:Play()
-    return tween
-end
-
+local targetRemoteName = "Remote" 
+local blockedEventArgument = "Gamer" 
 
 local function safeDisableConnections(instance, signalName)
     pcall(function()
@@ -90,62 +11,52 @@ end
 
 local function setupRemoteProtection()
     local detectedRemote = game:WaitForChild(targetRemoteName, 10)
-    if not detectedRemote then return end
-    
+    if not detectedRemote then
+        warn("Target remote not found within 10 seconds")
+        return
+    end
+
     local originalNamecall
     originalNamecall = hookmetamethod(game, "__namecall", function(self, ...)
         local args = {...}
         if self == detectedRemote and args[1] == blockedEventArgument then
-            return task.wait(9e9)
+            return task.wait(9e9) 
         end
         return originalNamecall(self, ...)
     end)
 end
 
 local function setupSpeedProtection()
-    local character = Players.LocalPlayer.Character
+    local character = game.Players.LocalPlayer.Character
     if not character then return end
-    
+
     local handler = character:WaitForChild("CharacterHandler", 5)
     if not handler then return end
-    
+
     local stats = handler:WaitForChild("Stats", 3)
     if stats then
         safeDisableConnections(stats.Walkspeed, "Changed")
+        
+
         stats.Walkspeed.Value = 16
         setupreadonly(stats.Walkspeed, true)
     end
 end
 
 local function setupFallDamageProtection()
-    local success, env = pcall(getsenv, Players.LocalPlayer.Character:WaitForChild("CharacterHandler").LocalScript)
+    local success, env = pcall(getsenv, game.Players.LocalPlayer.Character:WaitForChild("CharacterHandler").LocalScript)
     if success and env.Fall_Damage then
         env.Fall_Damage = function() end
-        setupreadonly(env, true)
+        setupreadonly(env, true) 
     end
 end
-
 
 task.spawn(setupRemoteProtection)
 task.spawn(setupSpeedProtection)
 task.spawn(setupFallDamageProtection)
 
-
-local stopFlying = nil
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if input.KeyCode == Enum.KeyCode.F then
-        if stopFlying then
-            stopFlying()
-            stopFlying = nil
-        else
-            stopFlying = enableFlying()
-        end
-    end
-end)
-
-
-Players.LocalPlayer.CharacterAdded:Connect(function()
-    task.wait(1)
+game.Players.LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(1) 
     setupSpeedProtection()
     setupFallDamageProtection()
 end)
