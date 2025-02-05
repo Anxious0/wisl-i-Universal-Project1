@@ -1,0 +1,13 @@
+local blacklistedPlayers = {
+    "skibiditoles789",
+    -- Add more blacklisted player names here
+}
+
+local player = game.Players.LocalPlayer
+
+for _, blacklistedName in ipairs(blacklistedPlayers) do
+    if player.Name:lower() == blacklistedName:lower() or player.DisplayName:lower() == blacklistedName:lower() then
+        player:Kick("You are blacklisted from using this script.")
+        return
+    end
+end
