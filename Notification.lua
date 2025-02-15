@@ -3,7 +3,7 @@ local Players = game:GetService("Players")
 
 local function createNotification()
     local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "ShopNotification"
+    screenGui.Name = "Notification"
     screenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
 
     local blur = Instance.new("BlurEffect")
@@ -12,17 +12,22 @@ local function createNotification()
 
     local container = Instance.new("Frame")
     container.Name = "Container"
-    container.Size = UDim2.new(0.4, 0, 0.15, 0)
+    container.Size = UDim2.new(0.2, 0, 0.075, 0)
     container.Position = UDim2.new(0.3, 0, -0.3, 0)
     container.BackgroundColor3 = Color3.fromRGB(5, 5, 15)
     container.BorderSizePixel = 0
     container.BackgroundTransparency = 1
+    container.Rotation = 0
 
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0.1, 0)
     corner.Parent = container
 
-    container.Parent = screenGui
+    local stroke = Instance.new("UIStroke")
+    stroke.Thickness = 5
+    stroke.Color = Color3.fromRGB(0, 0, 0)
+    stroke.Transparency = 1
+    stroke.Parent = container
 
     local gradient = Instance.new("UIGradient")
     gradient.Color = ColorSequence.new({
@@ -36,6 +41,7 @@ local function createNotification()
         NumberSequenceKeypoint.new(1, 0.7)
     })
     gradient.Parent = container
+    container.Parent = screenGui
 
     local glow = Instance.new("ImageLabel")
     glow.Name = "Glow"
@@ -45,6 +51,7 @@ local function createNotification()
     glow.Image = "rbxassetid://7331805068"
     glow.ImageColor3 = Color3.fromRGB(45, 120, 255)
     glow.ImageTransparency = 1
+    glow.Rotation = 0
     glow.Parent = container
 
     local text = Instance.new("TextLabel")
@@ -71,6 +78,7 @@ local function createNotification()
     particles.Lifetime = NumberRange.new(1)
     particles.Rate = 20
     particles.Speed = NumberRange.new(3)
+    particles.EmissionDirection = Enum.NormalId.Top
     particles.Parent = container
 
     local appearSound = Instance.new("Sound")
@@ -84,6 +92,7 @@ local function createNotification()
         Text = text,
         Blur = blur,
         Glow = glow,
+        Stroke = stroke,
         Particles = particles,
         AppearSound = appearSound
     }
@@ -95,6 +104,7 @@ local function animateNotification(elements, duration)
     local appearTweens = {
         TweenService:Create(elements.Container, TweenInfo.new(0.8, Enum.EasingStyle.Bounce), {
             Position = UDim2.new(0.3, 0, 0.1, 0),
+            Size = UDim2.new(0.4, 0, 0.15, 0),
             BackgroundTransparency = 0
         }),
         TweenService:Create(elements.Text, TweenInfo.new(0.6, Enum.EasingStyle.Quad), {
@@ -104,8 +114,12 @@ local function animateNotification(elements, duration)
         TweenService:Create(elements.Blur, TweenInfo.new(0.6), {
             Size = 8
         }),
-        TweenService:Create(elements.Glow, TweenInfo.new(0.6), {
-            ImageTransparency = 0.6
+        TweenService:Create(elements.Glow, TweenInfo.new(0.6, Enum.EasingStyle.Linear), {
+            ImageTransparency = 0.6,
+            Rotation = 360
+        }),
+        TweenService:Create(elements.Stroke, TweenInfo.new(0.6), {
+            Transparency = 0
         })
     }
 
@@ -113,11 +127,22 @@ local function animateNotification(elements, duration)
         tween:Play()
     end
 
+    local swingTween1 = TweenService:Create(elements.Container, TweenInfo.new(0.4, Enum.EasingStyle.Elastic), {
+        Rotation = 5
+    })
+    local swingTween2 = TweenService:Create(elements.Container, TweenInfo.new(0.4, Enum.EasingStyle.Elastic), {
+        Rotation = 0
+    })
+    swingTween1:Play()
+    swingTween1.Completed:Wait()
+    swingTween2:Play()
+
     task.wait(duration)
 
     local disappearTweens = {
         TweenService:Create(elements.Container, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
             Position = UDim2.new(0.3, 0, -0.3, 0),
+            Size = UDim2.new(0.2, 0, 0.075, 0),
             BackgroundTransparency = 1
         }),
         TweenService:Create(elements.Text, TweenInfo.new(0.4), {
@@ -128,7 +153,11 @@ local function animateNotification(elements, duration)
             Size = 0
         }),
         TweenService:Create(elements.Glow, TweenInfo.new(0.4), {
-            ImageTransparency = 1
+            ImageTransparency = 1,
+            Rotation = 0
+        }),
+        TweenService:Create(elements.Stroke, TweenInfo.new(0.4), {
+            Transparency = 1
         })
     }
 
