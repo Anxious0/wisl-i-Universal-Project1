@@ -59,7 +59,7 @@ local function createNotification()
     text.Size = UDim2.new(1, -40, 1, -40)
     text.Position = UDim2.new(0, 20, 0, 20)
     text.BackgroundTransparency = 1
-    text.Text = "✨ wisI'i Universal Project ✨"
+    text.Text = "Welcome ✨ wisI'i Universal Project ✨"
     text.TextColor3 = Color3.fromRGB(255, 255, 255)
     text.TextStrokeColor3 = Color3.fromRGB(45, 120, 255)
     text.TextStrokeTransparency = 0.7
