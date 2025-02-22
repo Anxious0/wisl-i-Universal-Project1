@@ -1,1 +1,684 @@
+function loadScript(url)
+    if not pcall(function()
+        loadstring(game:HttpGetAsync(url, true))()
+    end) then
+        return false
+    end
+    return true
+end
 
+task.spawn(function()
+    for _, url in ipairs({
+        "https://raw.githubusercontent.com/wisl884/wisl-i-Universal-Project1/refs/heads/main/Notification.lua"
+    }) do
+        task.spawn(function()
+            loadScript(url)
+        end)
+        task.wait(0.1)
+    end
+end)
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local WindowConfig = {
+    Name = "✨ wisI'i Universal Project Dead Rails ",
+    LoadingTitle = "Initializing wisI'i...",
+    LoadingSubtitle = "⌛ Initializing: Features v1.0⚡",
+    
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "wisI'i Project",
+        FileName = "config_v3"
+    },
+    
+    Theme = "Amethyst", -- Themes: Default | Ocean | AmberGlow | Light | Amethyst | Green | Bloom | DarkBlue | Serenity
+    
+    Discord = {
+        Enabled = true,
+        Invite = "XSUduWp52q",
+        RememberJoins = true
+    }
+}
+
+local Window = Rayfield:CreateWindow(WindowConfig)
+
+-- 📝 Available Theme Reference
+--[[
+    Theme Gallery:
+    • Default   - Classic Dark Theme
+    • Ocean     - Oceanic Blue Variant
+    • AmberGlow - Warm Amber Highlights
+    • Light     - Bright Mode Interface
+    • Amethyst  - Purple Royal Theme
+    • Green     - Nature-inspired Look
+    • Bloom     - Floral Color Scheme
+    • DarkBlue  - Deep Ocean Theme
+    • Serenity  - Calm Color Palette
+]]
+
+local Tab = Window:CreateTab("Brings", 4483362458) 
+local function GetItemNames()
+    local items = {}
+    local runtimeItems = workspace:FindFirstChild("RuntimeItems")
+    if runtimeItems then
+        for _, item in ipairs(runtimeItems:GetDescendants()) do
+            if item:IsA("Model") then
+                table.insert(items, item.Name)
+            end
+        end
+    else
+        warn("RuntimeItems folder not found!")
+    end
+    return items
+end
+
+
+local Dropdown = Tab:CreateDropdown({
+   Name = "Choose item",
+   Options = GetItemNames(), 
+   CurrentOption = "Select an item",
+   MultipleOptions = false,
+   Flag = "ItemDropdown", 
+   Callback = function(selectedItem)
+      
+       if type(selectedItem) == "table" then
+           selectedItem = selectedItem[1] 
+       end
+       
+   end,
+})
+
+
+local RefreshButton = Tab:CreateButton({
+   Name = "Refresh Items",
+   Callback = function()
+       
+       Dropdown:Refresh(GetItemNames())
+      
+   end,
+})
+
+
+local collectButton = Tab:CreateButton({
+   Name = "Collect Selected Item",
+   Callback = function()
+       local selectedItemName = Dropdown.CurrentOption
+       if type(selectedItemName) == "table" then
+           selectedItemName = selectedItemName[1] 
+       end
+
+       if selectedItemName == "Select an item" then
+           warn("No item selected!")
+           return
+       end
+
+       
+       local runtimeItems = workspace:FindFirstChild("RuntimeItems")
+       if not runtimeItems then
+           warn("RuntimeItems folder not found!")
+           return
+       end
+
+      
+       local selectedItem
+       for _, item in ipairs(runtimeItems:GetDescendants()) do
+           if item:IsA("Model") and item.Name == selectedItemName then
+               selectedItem = item
+               break
+           end
+       end
+
+       if not selectedItem then
+           warn("Item not found in RuntimeItems:", selectedItemName)
+           return
+       end
+
+       
+       local Players = game:GetService("Players")
+       local LocalPlayer = Players.LocalPlayer
+       if not LocalPlayer then
+           warn("LocalPlayer not found!")
+           return
+       end
+
+       local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+       local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+
+       
+       if not selectedItem.PrimaryPart then
+           warn(selectedItem.Name .. " has no PrimaryPart and cannot be moved.")
+           return
+       end
+
+       
+       selectedItem:SetPrimaryPartCFrame(HumanoidRootPart.CFrame + Vector3.new(0, 1, 0))
+       print("Collected:", selectedItem.Name)
+   end,
+})
+
+
+
+
+local collectAllButton = Tab:CreateButton({
+   Name = "Collect All Items",
+   Callback = function()
+       
+
+       
+       local runtimeItems = workspace:FindFirstChild("RuntimeItems")
+       if not runtimeItems then
+           warn("RuntimeItems folder not found!")
+           return
+       end
+
+       
+       local ps = game:GetService("Players").LocalPlayer
+     
+
+       local ch = ps.Character or ps.CharacterAdded:Wait()
+       local HumanoidRootPart = ch:WaitForChild("HumanoidRootPart")
+
+       
+       for _, item in ipairs(runtimeItems:GetDescendants()) do
+           if item:IsA("Model") then
+               
+               if item.PrimaryPart then
+                   
+                   local offset = HumanoidRootPart.CFrame.LookVector * 5
+                   item:SetPrimaryPartCFrame(HumanoidRootPart.CFrame + offset)
+                   
+               else
+                   warn(item.Name .. " has no PrimaryPart and cannot be moved.")
+               end
+           end
+       end 
+   end,
+})
+
+Tab:CreateSection("⚙️ PLAYER SETTINGS")
+
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local SoundService = game:GetService("SoundService")
+
+local LocalPlayer = Players.LocalPlayer
+
+local MovementController = {
+    State = {
+        CFrameMoving = false,
+        SpeedMultiplier = 0.8
+    },
+    Config = {
+        Active = true,
+        Initialized = false,
+        ToggleKey = Enum.KeyCode.C
+    }
+}
+
+local ZKeySounds = {
+    Toggle = Instance.new("Sound"),
+    Untoggle = Instance.new("Sound")
+}
+
+ZKeySounds.Toggle.SoundId = "rbxassetid://255881176"
+ZKeySounds.Toggle.Volume = 0.35
+ZKeySounds.Toggle.PlaybackSpeed = 1.4
+ZKeySounds.Toggle.TimePosition = 0.1
+ZKeySounds.Toggle.Parent = SoundService
+
+ZKeySounds.Untoggle.SoundId = "rbxassetid://255881176"
+ZKeySounds.Untoggle.Volume = 0.3
+ZKeySounds.Untoggle.PlaybackSpeed = 0.8
+ZKeySounds.Untoggle.TimePosition = 0.1
+ZKeySounds.Untoggle.Parent = SoundService
+
+local ToggleSounds = {
+    On = Instance.new("Sound"),
+    Off = Instance.new("Sound")
+}
+
+ToggleSounds.On.SoundId = "rbxassetid://6895079853"
+ToggleSounds.On.Volume = 0.5
+ToggleSounds.On.Parent = SoundService
+
+ToggleSounds.Off.SoundId = "rbxassetid://6895079725"
+ToggleSounds.Off.Volume = 0.5
+ToggleSounds.Off.Parent = SoundService
+
+local function updateCFrame()
+    if not MovementController.State.CFrameMoving or not MovementController.Config.Initialized then
+        return
+    end
+
+    local character = LocalPlayer.Character
+    if character and character:FindFirstChild("HumanoidRootPart") and character:FindFirstChild("Humanoid") then
+        local moveDir = character.Humanoid.MoveDirection
+        character.HumanoidRootPart.CFrame = character.HumanoidRootPart.CFrame + (moveDir * MovementController.State.SpeedMultiplier)
+    end
+end
+
+RunService.Heartbeat:Connect(function()
+    if MovementController.Config.Active and MovementController.State.CFrameMoving and MovementController.Config.Initialized then
+        pcall(updateCFrame)
+    end
+end)
+
+UserInputService.InputBegan:Connect(function(input, processed)
+    if processed then
+        return
+    end
+
+    if input.KeyCode == MovementController.Config.ToggleKey and MovementController.Config.Active then
+        MovementController.Config.Initialized = true
+        MovementController.State.CFrameMoving = not MovementController.State.CFrameMoving
+        
+        if MovementController.State.CFrameMoving then
+            ZKeySounds.Toggle:Play()
+        else
+            ZKeySounds.Untoggle:Play()
+        end
+        
+        Rayfield:Notify({
+            Title = "CFrame Speed",
+            Content = MovementController.State.CFrameMoving and "Enabled ⚡" or "Disabled 🚶",
+            Duration = 2
+        })
+    end
+end)
+
+Tab:CreateToggle({
+    Name = "💨 CFrame Speed [C]",
+    CurrentValue = true,
+    Flag = "CFrameSpeedEnabled",
+    Callback = function(state)
+        MovementController.Config.Active = state
+        if state then
+            ToggleSounds.On:Play()
+        else
+            ToggleSounds.Off:Play()
+        end
+    end
+})
+
+Tab:CreateSlider({
+    Name = "⚡ CFrame Multiplier",
+    Range = { 0.1, 20 },
+    Increment = 0.1,
+    CurrentValue = MovementController.State.SpeedMultiplier,
+    Flag = "CFrameMultiplier",
+    Callback = function(value)
+        MovementController.State.SpeedMultiplier = value
+    end
+})
+
+Tab:CreateInput({
+    Name = "🔑 Toggle Key",
+    PlaceholderText = "Enter KeyCode (e.g., Z)",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(text)
+        local keyCode = Enum.KeyCode[text:upper()]
+        if keyCode then
+            MovementController.Config.ToggleKey = keyCode
+            Rayfield:Notify({
+                Title = "Toggle Key Updated",
+                Content = "New toggle key: " .. text:upper(),
+                Duration = 2
+            })
+        else
+            Rayfield:Notify({
+                Title = "Error",
+                Content = "Invalid KeyCode entered!",
+                Duration = 2
+            })
+        end
+    end
+})
+
+_G.PlayersService = Players
+_G.Client = LocalPlayer
+
+local function getHumanoid(character)
+    local char = character or _G.Client.Character
+    if not char then
+        char = _G.Client.CharacterAdded:Wait()
+    end
+    return char:FindFirstChild("Humanoid") or char:WaitForChild("Humanoid", 5)
+end
+
+_G.Humanoid = getHumanoid()
+
+local function updateWalkSpeed(wsVal)
+    if _G.Humanoid and typeof(wsVal) == "number" then
+        wsVal = math.clamp(wsVal, 0, 1000) 
+        _G.Humanoid.WalkSpeed = wsVal
+    end
+end
+
+local function updateJumpHeight(jumpHVal)
+    if _G.Humanoid and typeof(jumpHVal) == "number" then
+        jumpHVal = math.clamp(jumpHVal, 0, 1000) 
+        _G.Humanoid.JumpHeight = jumpHVal
+    end
+end
+
+Tab:CreateSlider({
+    Name = "🏃 WalkSpeed (Default: 16)",
+    Range = {16, 450},
+    Increment = 1,
+    Suffix = "",
+    CurrentValue = 16,
+    Flag = "walkSpeedValue",
+    Callback = function(wsVal)
+        updateWalkSpeed(wsVal)
+    end,
+})
+
+Tab:CreateSlider({
+    Name = "🦘 JumpPower (Default: 7)",
+    Range = {7, 450},
+    Increment = 1,
+    Suffix = "",
+    CurrentValue = 7,
+    Flag = "jumpHeightValue",
+    Callback = function(jumpHVal)
+        updateJumpHeight(jumpHVal)
+    end,
+})
+
+local connection
+connection = _G.Client.CharacterAdded:Connect(function(character)
+    _G.Humanoid = getHumanoid(character)
+    
+    if _G.WalkSpeedSliding then
+        updateWalkSpeed(_G.WalkSpeedSliding.CurrentValue)
+    end
+    
+    if _G.HeightJumpPowerSliding then
+        updateJumpHeight(_G.HeightJumpPowerSliding.CurrentValue)
+    end
+end)
+
+_G.Cleanup = function()
+    if connection then
+        connection:Disconnect()
+    end
+    _G.Humanoid = nil
+    _G.WalkSpeedSliding = nil
+    _G.HeightJumpPowerSliding = nil
+end
+
+Tab:CreateButton({
+    Name = "🌫️ Clear Fog",
+    Callback = function()
+        Lighting.FogEnd = 1000000
+        Lighting.FogStart = 0
+        Lighting.Atmosphere.Density = 0
+    end
+})
+
+-- inf jump
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local infiniteJumpEnabled = false
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if infiniteJumpEnabled and input.KeyCode == Enum.KeyCode.Space then
+        local character = Players.LocalPlayer.Character
+        if character then
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+        end
+    end
+end)
+
+Tab:CreateToggle({
+    Name = "🦘 Infinite Jump",
+    CurrentValue = infiniteJumpEnabled,
+    Flag = "InfJumpEnabled",
+    Callback = function(Value)
+        infiniteJumpEnabled = Value
+    end
+})
+
+local States = {
+    NoClip = false,
+    ENoCooldowns = false
+}
+
+local Cache = {
+    Materials = {}
+}
+
+local noClipConnection
+
+local function toggleNoClip(state)
+    if state then
+        noClipConnection = RunService.Stepped:Connect(function()
+            if LocalPlayer.Character then
+                for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+    else
+        if noClipConnection then
+            noClipConnection:Disconnect()
+            noClipConnection = nil
+        end
+        if LocalPlayer.Character then
+            for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = true
+                end
+            end
+        end
+    end
+end
+
+local Toggles = {
+    ["E No Cooldowns"] = {
+        Icon = "⚡",
+        Callback = function(state)
+            States.ENoCooldowns = state
+            for _, prompt in pairs(workspace:GetDescendants()) do
+                if prompt:IsA("ProximityPrompt") then
+                    prompt.HoldDuration = state and 0 or 1
+                end
+            end
+        end
+    },
+    ["No-Clip"] = {
+        Icon = "👻",
+        Callback = function(state)
+            States.NoClip = state
+            toggleNoClip(state)
+        end
+    }
+}
+
+for name, data in pairs(Toggles) do
+    Tab:CreateToggle({
+        Name = data.Icon .. " " .. name,
+        CurrentValue = false,
+        Flag = name:gsub("%s+", "") .. "Toggle",
+        Callback = data.Callback
+    })
+end
+
+local player = game.Players.LocalPlayer
+local VirtualUser = game:GetService("VirtualUser")
+local RunService = game:GetService("RunService")
+local connection = nil
+
+local CONFIG = {
+    CLICK_INTERVAL = 30, 
+    DEBUG_MODE = false   
+}
+
+local function notifyUser(message)
+    if CONFIG.DEBUG_MODE then
+        print("[Anti-AFK] " .. message)
+    end
+end
+
+local function toggleAntiAFK(enable)
+    if enable and not connection then
+        connection = player.Idled:Connect(function()
+            VirtualUser:CaptureController()
+            VirtualUser:ClickButton2(Vector2.new())
+            notifyUser("Anti-AFK triggered")
+        end)
+        notifyUser("Anti-AFK enabled")
+    elseif not enable and connection then
+        connection:Disconnect()
+        connection = nil
+        notifyUser("Anti-AFK disabled")
+    end
+end
+
+if getgenv().afk6464 == nil then
+    getgenv().afk6464 = true
+end
+
+toggleAntiAFK(true)
+
+Tab:CreateToggle({
+    Name = "🔄 Anti-AFK",
+    CurrentValue = getgenv().afk6464,
+    Flag = "AntiAFKToggle",
+    Callback = function(newValue)
+        getgenv().afk6464 = newValue
+        toggleAntiAFK(newValue)
+    end,
+})
+
+
+local EspTab = Window:CreateTab("ESP", 4483362458)
+
+
+local ESPHandles = {}
+local ESPEnabled = false
+
+
+local function CreateESP(object, color)
+    if not object or not object.PrimaryPart then return end
+
+    local highlight = Instance.new("Highlight")
+    highlight.Name = "ESP_Highlight"
+    highlight.Adornee = object
+    highlight.FillColor = color
+    highlight.OutlineColor = color
+    highlight.Parent = object
+
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "ESP_Billboard"
+    billboard.Adornee = object.PrimaryPart
+    billboard.Size = UDim2.new(0, 200, 0, 50)
+    billboard.StudsOffset = Vector3.new(0, 5, 0)
+    billboard.AlwaysOnTop = true
+    billboard.Parent = object
+
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Text = object.Name
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.TextColor3 = color
+    textLabel.BackgroundTransparency = 1
+    textLabel.TextSize = 7
+    textLabel.Parent = billboard
+
+    ESPHandles[object] = {Highlight = highlight, Billboard = billboard}
+end
+
+
+local function ClearESP()
+    for obj, handles in pairs(ESPHandles) do
+        if handles.Highlight then handles.Highlight:Destroy() end
+        if handles.Billboard then handles.Billboard:Destroy() end
+    end
+    ESPHandles = {}
+end
+
+
+local function UpdateESP()
+    
+    ClearESP()
+
+    
+    local runtimeItems = workspace:FindFirstChild("RuntimeItems")
+    if runtimeItems then
+        for _, item in ipairs(runtimeItems:GetDescendants()) do
+            if item:IsA("Model") then
+                CreateESP(item, Color3.new(1, 0, 0)) 
+            end
+        end
+    end
+
+    
+    local destroyedHouse = workspace:FindFirstChild("RandomBuildings") and workspace.RandomBuildings:FindFirstChild("DestroyedHouse")
+    local zombiePart = destroyedHouse and destroyedHouse:FindFirstChild("StandaloneZombiePart")
+    local zombies = zombiePart and zombiePart:FindFirstChild("Zombies")
+    if zombies then
+        for _, zombie in ipairs(zombies:GetChildren()) do
+            if zombie:IsA("Model") then
+                CreateESP(zombie, Color3.new(0, 1, 0)) 
+            end
+        end
+    end
+
+    
+    local nightEnemies = workspace:FindFirstChild("NightEnemies")
+    if nightEnemies then
+        for _, enemy in ipairs(nightEnemies:GetDescendants()) do
+            if enemy:IsA("Model") then
+                CreateESP(enemy, Color3.new(0, 0, 1)) 
+            end
+        end
+    end
+
+    
+    local baseplates = workspace:FindFirstChild("Baseplates")
+    if baseplates and #baseplates:GetChildren() >= 2 then
+        local secondBaseplate = baseplates:GetChildren()[2]
+        local centerBaseplate = secondBaseplate and secondBaseplate:FindFirstChild("CenterBaseplate")
+        local animals = centerBaseplate and centerBaseplate:FindFirstChild("Animals")
+        if animals then
+            for _, animal in ipairs(animals:GetDescendants()) do
+                if animal:IsA("Model") then
+                    CreateESP(animal, Color3.new(1, 0, 1)) 
+                end
+            end
+        end
+    end
+end
+
+
+local function AutoUpdateESP()
+    while ESPEnabled do
+        UpdateESP()
+        wait() 
+    end
+end
+
+
+local espToggle = EspTab:CreateToggle({
+    Name = "ESP Items and Mobs",
+    CurrentValue = false,
+    Flag = "ESPAllToggle",
+    Callback = function(Value)
+        ESPEnabled = Value
+        if Value then
+            UpdateESP()
+            
+            coroutine.wrap(AutoUpdateESP)()
+        else
+            ClearESP()
+        end
+    end
+})
