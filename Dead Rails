@@ -57,6 +57,7 @@ local Window = Rayfield:CreateWindow(WindowConfig)
 ]]
 
 local Tab = Window:CreateTab("Brings", 4483362458) 
+
 local function GetItemNames()
     local items = {}
     local runtimeItems = workspace:FindFirstChild("RuntimeItems")
@@ -157,8 +158,6 @@ local collectButton = Tab:CreateButton({
 })
 
 
-
-
 local collectAllButton = Tab:CreateButton({
    Name = "Collect All Items",
    Callback = function()
@@ -193,6 +192,32 @@ local collectAllButton = Tab:CreateButton({
            end
        end 
    end,
+})
+
+local collectAllButton = Tab:CreateButton({
+    Name = "Collect Bandages",
+    Callback = function()
+        local runtimeItems = workspace:FindFirstChild("RuntimeItems")
+        if not runtimeItems then
+            warn("RuntimeItems folder not found!")
+            return
+        end
+
+        local ps = game:GetService("Players").LocalPlayer
+        local ch = ps.Character or ps.CharacterAdded:Wait()
+        local HumanoidRootPart = ch:WaitForChild("HumanoidRootPart")
+
+        for _, item in ipairs(runtimeItems:GetDescendants()) do
+            if item:IsA("Model") and item.Name == "Bandage" then
+                if item.PrimaryPart then
+                    local offset = HumanoidRootPart.CFrame.LookVector * 5
+                    item:SetPrimaryPartCFrame(HumanoidRootPart.CFrame + offset)
+                else
+                    warn(item.Name .. " has no PrimaryPart and cannot be moved.")
+                end
+            end
+        end 
+    end,
 })
 
 Tab:CreateSection("⚙️ PLAYER SETTINGS")
@@ -445,9 +470,48 @@ Tab:CreateToggle({
     end
 })
 
+local isEnabled = false
+local canPressN = false
+
+Tab:CreateToggle({
+    Name = "E No Cooldown (N)",
+    CurrentValue = false,
+    Flag = "ENoCD",
+    Callback = function(Value)
+        isEnabled = Value
+        canPressN = Value 
+        
+        if Value then
+
+            for _, prompt in pairs(workspace:GetDescendants()) do
+                if prompt:IsA("ProximityPrompt") then 
+                    prompt.HoldDuration = 0 
+                end
+            end
+        else 
+
+            for _, prompt in pairs(workspace:GetDescendants()) do
+                if prompt:IsA("ProximityPrompt") then 
+                    prompt.HoldDuration = 1 
+                end
+            end
+        end
+    end
+})
+
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.N and canPressN then
+
+        for _, prompt in pairs(workspace:GetDescendants()) do
+            if prompt:IsA("ProximityPrompt") then 
+                prompt.HoldDuration = 0 
+            end
+        end
+    end
+end)
+
 local States = {
     NoClip = false,
-    ENoCooldowns = false
 }
 
 local Cache = {
@@ -483,17 +547,6 @@ local function toggleNoClip(state)
 end
 
 local Toggles = {
-    ["E No Cooldowns"] = {
-        Icon = "⚡",
-        Callback = function(state)
-            States.ENoCooldowns = state
-            for _, prompt in pairs(workspace:GetDescendants()) do
-                if prompt:IsA("ProximityPrompt") then
-                    prompt.HoldDuration = state and 0 or 1
-                end
-            end
-        end
-    },
     ["No-Clip"] = {
         Icon = "👻",
         Callback = function(state)
@@ -511,21 +564,6 @@ for name, data in pairs(Toggles) do
         Callback = data.Callback
     })
 end
-
-local UserInputService = game:GetService("UserInputService")
-
-UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
-    if gameProcessedEvent then return end
-    if input.KeyCode == Enum.KeyCode.N then
-        States.ENoCooldowns = false
-        for _, prompt in pairs(workspace:GetDescendants()) do
-            if prompt:IsA("ProximityPrompt") then
-                prompt.HoldDuration = 1
-            end
-        end
-        print("System reset: E No Cooldowns disabled and restored to default state.")
-    end
-end)
 
 local player = game.Players.LocalPlayer
 local VirtualUser = game:GetService("VirtualUser")
