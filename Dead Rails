@@ -433,15 +433,6 @@ _G.Cleanup = function()
     _G.HeightJumpPowerSliding = nil
 end
 
-Tab:CreateButton({
-    Name = "🌫️ Clear Fog",
-    Callback = function()
-        Lighting.FogEnd = 1000000
-        Lighting.FogStart = 0
-        Lighting.Atmosphere.Density = 0
-    end
-})
-
 -- inf jump
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
