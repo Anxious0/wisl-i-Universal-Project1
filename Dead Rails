@@ -512,6 +512,21 @@ for name, data in pairs(Toggles) do
     })
 end
 
+local UserInputService = game:GetService("UserInputService")
+
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if gameProcessedEvent then return end
+    if input.KeyCode == Enum.KeyCode.N then
+        States.ENoCooldowns = false
+        for _, prompt in pairs(workspace:GetDescendants()) do
+            if prompt:IsA("ProximityPrompt") then
+                prompt.HoldDuration = 1
+            end
+        end
+        print("System reset: E No Cooldowns disabled and restored to default state.")
+    end
+end)
+
 local player = game.Players.LocalPlayer
 local VirtualUser = game:GetService("VirtualUser")
 local RunService = game:GetService("RunService")
