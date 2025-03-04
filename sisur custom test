@@ -558,44 +558,52 @@ local RayfieldLibrary = {
 		},
 
 		Wisl = {
-			TextColor = Color3.fromRGB(255, 245, 230),
-			Background = Color3.fromRGB(35, 30, 50),
-			Topbar = Color3.fromRGB(50, 40, 70),
-			Shadow = Color3.fromRGB(25, 20, 40),
-		
-			NotificationBackground = Color3.fromRGB(60, 50, 80),
-			NotificationActionsBackground = Color3.fromRGB(70, 60, 90),
-		
-			TabBackground = Color3.fromRGB(45, 35, 65),
-			TabStroke = Color3.fromRGB(80, 70, 100),
-			TabBackgroundSelected = Color3.fromRGB(100, 80, 140),
-			TabTextColor = Color3.fromRGB(220, 210, 240),
-			SelectedTabTextColor = Color3.fromRGB(255, 220, 180),
-		
-			ElementBackground = Color3.fromRGB(50, 40, 70),
-			ElementBackgroundHover = Color3.fromRGB(70, 60, 90),
-			SecondaryElementBackground = Color3.fromRGB(60, 50, 80),
-			ElementStroke = Color3.fromRGB(90, 80, 110),
-			SecondaryElementStroke = Color3.fromRGB(80, 70, 100),
-		
-			SliderBackground = Color3.fromRGB(60, 50, 80),
-			SliderProgress = Color3.fromRGB(255, 200, 100),
-			SliderStroke = Color3.fromRGB(80, 70, 100),
-		
-			ToggleBackground = Color3.fromRGB(50, 40, 70),
-			ToggleEnabled = Color3.fromRGB(255, 180, 120),
-			ToggleDisabled = Color3.fromRGB(100, 90, 120),
-			ToggleEnabledStroke = Color3.fromRGB(255, 200, 150),
-			ToggleDisabledStroke = Color3.fromRGB(90, 80, 110),
-			ToggleEnabledOuterStroke = Color3.fromRGB(120, 100, 140),
-			ToggleDisabledOuterStroke = Color3.fromRGB(100, 90, 120),
-		
-			DropdownSelected = Color3.fromRGB(70, 60, 90),
-			DropdownUnselected = Color3.fromRGB(50, 40, 70),
-		
-			InputBackground = Color3.fromRGB(60, 50, 80),
-			InputStroke = Color3.fromRGB(90, 80, 110),
-			PlaceholderColor = Color3.fromRGB(150, 140, 170)
+			-- Main text and backgrounds
+			TextColor = Color3.fromRGB(230, 255, 250),         -- Light cyan text for readability
+			Background = Color3.fromRGB(25, 25, 35),           -- Deep navy blue background
+			Topbar = Color3.fromRGB(40, 45, 65),               -- Slightly lighter navy for topbar
+			Shadow = Color3.fromRGB(15, 15, 25),               -- Darker shadow for depth
+			
+			-- Notifications
+			NotificationBackground = Color3.fromRGB(45, 50, 75),      -- Soft blue-purple for notifications
+			NotificationActionsBackground = Color3.fromRGB(55, 60, 85), -- Slightly lighter for actions
+			
+			-- Tabs
+			TabBackground = Color3.fromRGB(35, 40, 60),              -- Deep blue for tabs
+			TabStroke = Color3.fromRGB(70, 80, 120),                 -- Vibrant blue-purple border
+			TabBackgroundSelected = Color3.fromRGB(80, 90, 140),      -- Brighter purple-blue for selected
+			TabTextColor = Color3.fromRGB(200, 210, 255),            -- Soft blue text
+			SelectedTabTextColor = Color3.fromRGB(255, 230, 200),    -- Warm gold for selected tab text
+			
+			-- Elements
+			ElementBackground = Color3.fromRGB(40, 45, 65),          -- Deep blue-purple for elements
+			ElementBackgroundHover = Color3.fromRGB(55, 65, 95),     -- Lighter when hovering
+			SecondaryElementBackground = Color3.fromRGB(50, 55, 75), -- Slightly lighter secondary elements
+			ElementStroke = Color3.fromRGB(80, 90, 130),             -- Vibrant blue-purple border
+			SecondaryElementStroke = Color3.fromRGB(70, 80, 120),    -- Slightly darker secondary border
+			
+			-- Sliders
+			SliderBackground = Color3.fromRGB(45, 50, 70),           -- Deep blue slider background
+			SliderProgress = Color3.fromRGB(120, 210, 255),          -- Bright cyan for progress
+			SliderStroke = Color3.fromRGB(70, 80, 120),              -- Blue-purple border
+			
+			-- Toggles
+			ToggleBackground = Color3.fromRGB(40, 45, 65),           -- Deep blue toggle background
+			ToggleEnabled = Color3.fromRGB(130, 230, 180),           -- Mint green for enabled state
+			ToggleDisabled = Color3.fromRGB(90, 95, 120),            -- Muted purple for disabled
+			ToggleEnabledStroke = Color3.fromRGB(150, 255, 200),     -- Lighter mint border when enabled
+			ToggleDisabledStroke = Color3.fromRGB(80, 85, 110),      -- Darker border when disabled
+			ToggleEnabledOuterStroke = Color3.fromRGB(100, 180, 140), -- Outer border when enabled
+			ToggleDisabledOuterStroke = Color3.fromRGB(70, 75, 100), -- Outer border when disabled
+			
+			-- Dropdowns
+			DropdownSelected = Color3.fromRGB(60, 70, 100),          -- Vibrant blue for selected
+			DropdownUnselected = Color3.fromRGB(40, 45, 65),         -- Darker for unselected
+			
+			-- Inputs
+			InputBackground = Color3.fromRGB(45, 50, 70),            -- Deep blue input background
+			InputStroke = Color3.fromRGB(80, 90, 130),               -- Vibrant border
+			PlaceholderColor = Color3.fromRGB(140, 150, 190)         -- Soft blue for placeholder
 		},
 	}
 }
