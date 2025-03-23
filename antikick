@@ -1,154 +1,19 @@
+local first = false
+if hookmetamethod then
+    OldNameCall = hookmetamethod(game, "__namecall", function(Self, ...)
+        local NameCallMethod = getnamecallmethod()
 
-if getgenv().ImprovedAntiKick then 
-    return 
-end
+        if tostring(string.lower(NameCallMethod)) == "kick" and not first then
+            print("AntiKick: blocked attempt to kick you.")
+            return nil
+        end
 
-local function checkEnvironment()
-    local success = pcall(function()
-        return getgenv, getnamecallmethod, hookmetamethod, hookfunction, newcclosure, checkcaller
+        return OldNameCall(Self, ...)
     end)
-    
-    if not success then
-        warn("Anti-Kick: Required functions not available in this environment")
-        return false
+    if not First then
+        First = true
     end
-    
-    return true
-end
-
-if not checkEnvironment() then
+else
+    warn("AntiKick: unsupported executor, missing hookmetamethod function.")
     return
 end
-
-local getgenv, getnamecallmethod = getgenv, getnamecallmethod
-local hookmetamethod, hookfunction = hookmetamethod, hookfunction
-local newcclosure, checkcaller = newcclosure, checkcaller
-local lower, gsub, match = string.lower, string.gsub, string.match
-
-local cloneref = cloneref or function(...) return ... end
-local clonefunction = clonefunction or function(...) return ... end
-
-local Players = cloneref(game:GetService("Players"))
-local LocalPlayer = Players.LocalPlayer
-local StarterGui = cloneref(game:GetService("StarterGui"))
-local SetCore = clonefunction(StarterGui.SetCore)
-local FindFirstChild = clonefunction(game.FindFirstChild)
-
-local function compareInstances(instance1, instance2)
-    if typeof(instance1) ~= "Instance" or typeof(instance2) ~= "Instance" then
-        return false
-    end
-    return instance1 == instance2
-end
-
-local function canCastToString(...)
-    return pcall(FindFirstChild, game, ...)
-end
-
-local function sendNotification(title, text, duration)
-    pcall(function()
-        SetCore(StarterGui, "SendNotification", {
-            Title = title or "Anti-Kick",
-            Text = text,
-            Icon = "rbxassetid://6238540373",
-            Duration = duration or 2
-        })
-    end)
-end
-
-getgenv().ImprovedAntiKick = {
-    Enabled = true,
-    SendNotifications = true,
-    CheckCaller = true,
-    BlockedAttempts = 0
-}
-
-local function setupAntiKick()
-    local oldNamecall
-    oldNamecall = hookmetamethod(game, "__namecall", newcclosure(function(...)
-        local self, message = ...
-        local method = getnamecallmethod()
-        
-        if ImprovedAntiKick.Enabled and 
-           ((ImprovedAntiKick.CheckCaller and not checkcaller()) or true) and
-           compareInstances(self, LocalPlayer) and 
-           gsub(method:lower(), "^%l", string.upper) == "Kick" then
-            
-            if canCastToString(message) then
-                ImprovedAntiKick.BlockedAttempts = ImprovedAntiKick.BlockedAttempts + 1
-                
-                if ImprovedAntiKick.SendNotifications then
-                    sendNotification(
-                        "Anti-Kick", 
-                        "Blocked kick attempt #" .. ImprovedAntiKick.BlockedAttempts .. 
-                        (message and "\nReason: " .. tostring(message) or "")
-                    )
-                end
-                
-                return nil 
-            end
-        end
-        
-        return oldNamecall(...)
-    end))
-    
-    local oldKickFunction
-    oldKickFunction = hookfunction(LocalPlayer.Kick, newcclosure(function(self, message)
-        if ImprovedAntiKick.Enabled and
-           ((ImprovedAntiKick.CheckCaller and not checkcaller()) or true) and
-           compareInstances(self, LocalPlayer) then
-            
-            if canCastToString(message) then
-                ImprovedAntiKick.BlockedAttempts = ImprovedAntiKick.BlockedAttempts + 1
-                
-                if ImprovedAntiKick.SendNotifications then
-                    sendNotification(
-                        "Anti-Kick", 
-                        "Blocked kick attempt #" .. ImprovedAntiKick.BlockedAttempts .. 
-                        (message and "\nReason: " .. tostring(message) or "")
-                    )
-                end
-                
-                return nil 
-            end
-        end
-        
-        return oldKickFunction(self, message)
-    end))
-end
-
-local function initialize()
-    setupAntiKick()
-    
-    if ImprovedAntiKick.SendNotifications then
-        sendNotification("Anti-Kick", "Script loaded successfully!", 3)
-    end
-    
-    local function setupCommands()
-        local commands = {
-            ["/antikick toggle"] = function()
-                ImprovedAntiKick.Enabled = not ImprovedAntiKick.Enabled
-                sendNotification("Anti-Kick", "Protection " .. (ImprovedAntiKick.Enabled and "enabled" or "disabled"), 2)
-            end,
-            ["/antikick notify"] = function()
-                ImprovedAntiKick.SendNotifications = not ImprovedAntiKick.SendNotifications
-                sendNotification("Anti-Kick", "Notifications " .. (ImprovedAntiKick.SendNotifications and "enabled" or "disabled"), 2)
-            end
-        }
-        
-        pcall(function()
-            Players.LocalPlayer.Chatted:Connect(function(message)
-                local cmd = message:lower()
-                if commands[cmd] then
-                    commands[cmd]()
-                end
-            end)
-        end)
-    end
-    
-    pcall(setupCommands)
-end
-
-initialize()
-
-return ImprovedAntiKick
