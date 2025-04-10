@@ -1,0 +1,179 @@
+
+local permissions = {
+    owners = { "III1Dl", "", "" },
+    coowner = { "" },
+    developers = { "" },
+    staff = { "", "" }
+}
+
+local function findList(list, name)
+    for _, v in ipairs(list) do
+        if v == name then
+            return true
+        end
+    end
+    return false
+end
+
+local function getUserRole(playerName)
+    if findList(permissions.owners, playerName) then
+        return "Owner"
+    elseif findList(permissions.developers, playerName) then
+        return "Developer"
+    elseif findList(permissions.staff, playerName) then
+        return "Staff"
+    elseif findList(permissions.coowner, playerName) then
+        return "CoOwner"
+    else
+        return "User"
+    end
+end
+
+local function createTagFrame(parent, tagName, text, bgColor, textColor)
+    local frame = Instance.new("Frame")
+    frame.Name = tagName .. "Tag"
+    frame.Parent = parent
+    frame.BackgroundColor3 = bgColor
+    frame.BorderColor3 = Color3.fromRGB(31, 31, 31)
+    frame.BorderSizePixel = 5
+    frame.Position = UDim2.new(0.1, 0, 0, 0)
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.Visible = false
+    frame.ZIndex = 2
+
+    local label = Instance.new("TextLabel")
+    label.Name = "TagContent"
+    label.Parent = frame
+    label.Active = true
+    label.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    label.BorderSizePixel = 0
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.ZIndex = 2
+    label.Font = Enum.Font.Unknown
+    label.Text = text
+    label.TextColor3 = textColor
+    label.TextScaled = true
+    label.TextSize = 28
+    label.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextWrapped = true
+
+    local uicornerLabel = Instance.new("UICorner")
+    uicornerLabel.CornerRadius = UDim.new(0.2, 0)
+    uicornerLabel.Parent = label
+
+    local uiPaddingLabel = Instance.new("UIPadding")
+    uiPaddingLabel.PaddingBottom = UDim.new(0.15, 0)
+    uiPaddingLabel.PaddingTop = UDim.new(0.15, 0)
+    uiPaddingLabel.Parent = label
+
+    local uiPaddingFrame = Instance.new("UIPadding")
+    uiPaddingFrame.PaddingBottom = UDim.new(0.08, 0)
+    uiPaddingFrame.PaddingLeft = UDim.new(0.015, 0)
+    uiPaddingFrame.PaddingRight = UDim.new(0.015, 0)
+    uiPaddingFrame.PaddingTop = UDim.new(0.08, 0)
+    uiPaddingFrame.Parent = frame
+
+    local uicornerFrame = Instance.new("UICorner")
+    uicornerFrame.CornerRadius = UDim.new(0.2, 0)
+    uicornerFrame.Parent = frame
+
+    return frame
+end
+
+local function headtagCreate(plr, fromHost)
+    local char = plr.Character or plr.CharacterAdded:Wait()
+    if not char then return end
+
+    local head = char:FindFirstChild("Head")
+    if not head then return end
+
+    local gui = Instance.new("BillboardGui")
+    gui.Name = "Wisl"
+    gui.Parent = head
+    gui.Active = true
+    gui.Size = UDim2.new(3, 0, 0.5, 0)
+    gui.StudsOffset = Vector3.new(0, 2, 0)
+
+    local listLayout = Instance.new("UIListLayout")
+    listLayout.Parent = gui
+    listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    listLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    local tags = {}
+    tags["Owner"] = createTagFrame(gui, "Owner", "Owner", Color3.fromRGB(85,170,255), Color3.fromRGB(85,170,255))
+    tags["Developer"] = createTagFrame(gui, "Developer", "Developer", Color3.fromRGB(255,255,127), Color3.fromRGB(255,255,127))
+    tags["CoOwner"] = createTagFrame(gui, "CoOwner", "Co-Owner", Color3.fromRGB(255,85,127), Color3.fromRGB(255,85,127))
+    tags["Staff"] = createTagFrame(gui, "Staff", "Staff Member", Color3.fromRGB(85,255,255), Color3.fromRGB(85,255,255))
+    tags["User"] = createTagFrame(gui, "User", "Wisl User", Color3.fromRGB(77, 255, 0), Color3.fromRGB(97,223,255))
+
+    local role = getUserRole(plr.Name)
+    for key, tagFrame in pairs(tags) do
+        tagFrame.Visible = (key == role)
+    end
+end
+
+local function onPlayerAdded(player)
+    player.CharacterAdded:Connect(function()
+        task.wait(1)
+        headtagCreate(player)
+    end)
+
+    if player.Character then
+        task.spawn(function()
+            task.wait(1)
+            headtagCreate(player)
+        end)
+    end
+
+    player.Chatted:Connect(function(message)
+        if message == "Wisl()" then
+            local char = player.Character or player.CharacterAdded:Wait()
+            if not char then return end
+            local head = char:FindFirstChild("Head")
+            if not head then return end
+
+            local gui = head:FindFirstChild("Wisl")
+            if not gui then return end
+
+            local role = getUserRole(player.Name)
+            for _, child in ipairs(gui:GetChildren()) do
+                if child:IsA("Frame") then
+                    child.Visible = false
+                end
+            end
+
+            if role == "Owner" then
+                local tag = gui:FindFirstChild("OwnerTag")
+                if tag then tag.Visible = true end
+            elseif role == "Developer" then
+                local tag = gui:FindFirstChild("DeveloperTag")
+                if tag then tag.Visible = true end
+            elseif role == "Staff" then
+                local tag = gui:FindFirstChild("StaffTag")
+                if tag then tag.Visible = true end
+            elseif role == "CoOwner" then
+                local tag = gui:FindFirstChild("CoOwnerTag")
+                if tag then tag.Visible = true end
+            else
+                local tag = gui:FindFirstChild("UserTag")
+                if tag then tag.Visible = true end
+            end
+        end
+    end)
+end
+
+for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+    onPlayerAdded(player)
+end
+
+game:GetService("Players").PlayerAdded:Connect(onPlayerAdded)
+
+task.spawn(function()
+    while true do
+        for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+            game:GetService("Players"):Chat("kiExe()")
+        end
+        task.wait(60)
+    end
+end)
