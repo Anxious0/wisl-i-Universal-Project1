@@ -1,10 +1,12 @@
-
 local permissions = {
     owners = { "III1Dl", "", "" },
     coowner = { "" },
     developers = { "" },
     staff = { "", "" }
 }
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 
 local function findList(list, name)
     for _, v in ipairs(list) do
@@ -80,7 +82,10 @@ local function createTagFrame(parent, tagName, text, bgColor, textColor)
     return frame
 end
 
-local function headtagCreate(plr, fromHost)
+local function headtagCreate(plr)
+    -- Only create tag for the local player (the one running the script)
+    if plr ~= LocalPlayer then return end
+    
     local char = plr.Character or plr.CharacterAdded:Wait()
     if not char then return end
 
@@ -127,7 +132,7 @@ local function onPlayerAdded(player)
     end
 
     player.Chatted:Connect(function(message)
-        if message == "Wisl()" then
+        if message == "Wisl()" and player == LocalPlayer then
             local char = player.Character or player.CharacterAdded:Wait()
             if not char then return end
             local head = char:FindFirstChild("Head")
@@ -163,16 +168,16 @@ local function onPlayerAdded(player)
     end)
 end
 
-for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+for _, player in ipairs(Players:GetPlayers()) do
     onPlayerAdded(player)
 end
 
-game:GetService("Players").PlayerAdded:Connect(onPlayerAdded)
+Players.PlayerAdded:Connect(onPlayerAdded)
 
 task.spawn(function()
     while true do
-        for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
-            game:GetService("Players"):Chat("kiExe()")
+        for _, player in ipairs(Players:GetPlayers()) do
+            Players:Chat("Wisl()")
         end
         task.wait(60)
     end
