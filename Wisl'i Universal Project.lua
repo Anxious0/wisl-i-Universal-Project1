@@ -66,6 +66,7 @@ end
 
 local OldButton = createButton("OLD VERSION // NO UPDATE", 50, Color3.fromRGB(80, 80, 180))
 local NewButton = createButton("NEW VERSION", 110, Color3.fromRGB(80, 180, 80))
+local MobileButton = createButton("Mobile VERSION", 170, Color3.fromRGB(100, 180, 200))
 
 OldButton.MouseButton1Click:Connect(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/wisl884/wisl-i-Universal-Project1/refs/heads/main/Wisl%20Universal%20Project%20OLD.lua", true))()
@@ -74,6 +75,11 @@ end)
 
 NewButton.MouseButton1Click:Connect(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/wisl884/wisl-i-Universal-Project1/refs/heads/main/Wisl'i%20Universal%20Project%20new%20UI.lua", true))()
+    ScreenGui:Destroy()
+end)
+
+MobileButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/wisl884/wisl-i-Universal-Project1/refs/heads/main/Wisl'i%20Universal%20Project%20Mobile.lua", true))()
     ScreenGui:Destroy()
 end)
 
