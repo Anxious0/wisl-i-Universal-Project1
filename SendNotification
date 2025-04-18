@@ -1,0 +1,11 @@
+game.StarterGui:SetCore("SendNotification", {
+    Title = "Script is loading", 
+    Text = "Please allow 5-20 seconds for the script to load.", 
+    Duration = 20 
+})
+
+game.StarterGui:SetCore("SendNotification", {
+    Title = "sorry", 
+   	Text = "Sorry For Script Delay.",
+    Duration = 20 
+})
