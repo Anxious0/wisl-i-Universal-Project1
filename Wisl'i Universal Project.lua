@@ -9,27 +9,33 @@ ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 320, 0, 360)
-MainFrame.Position = UDim2.new(0.5, -160, 0.5, -180)
-MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+MainFrame.Size = UDim2.new(0, 320, 0, 300)
+MainFrame.Position = UDim2.new(0.5, -160, 0.5, -150)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 MainFrame.BorderSizePixel = 0
 MainFrame.Parent = ScreenGui
-MainFrame.BackgroundTransparency = 1 
+MainFrame.BackgroundTransparency = 1
 
 local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.CornerRadius = UDim.new(0, 20) 
 UICorner.Parent = MainFrame
+
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Color = Color3.fromRGB(60, 60, 80)
+UIStroke.Thickness = 2
+UIStroke.Transparency = 0.5
+UIStroke.Parent = MainFrame
 
 local Shadow = Instance.new("ImageLabel")
 Shadow.Name = "Shadow"
 Shadow.AnchorPoint = Vector2.new(0.5, 0.5)
 Shadow.BackgroundTransparency = 1
 Shadow.Position = UDim2.new(0.5, 0, 0.5, 0)
-Shadow.Size = UDim2.new(1, 40, 1, 40)
+Shadow.Size = UDim2.new(1, 50, 1, 50) 
 Shadow.ZIndex = 0
 Shadow.Image = "rbxassetid://6014261993"
 Shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-Shadow.ImageTransparency = 1 
+Shadow.ImageTransparency = 0.7 
 Shadow.ScaleType = Enum.ScaleType.Slice
 Shadow.SliceCenter = Rect.new(49, 49, 450, 450)
 Shadow.Parent = MainFrame
@@ -37,53 +43,25 @@ Shadow.Parent = MainFrame
 local Header = Instance.new("Frame")
 Header.Name = "Header"
 Header.Size = UDim2.new(1, 0, 0, 50)
-Header.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
+Header.BackgroundColor3 = Color3.fromRGB(40, 40, 55)
 Header.BorderSizePixel = 0
 Header.Parent = MainFrame
 
 local HeaderCorner = Instance.new("UICorner")
-HeaderCorner.CornerRadius = UDim.new(0, 12)
+HeaderCorner.CornerRadius = UDim.new(0, 20) 
 HeaderCorner.Parent = Header
-
-local HeaderFix = Instance.new("Frame")
-HeaderFix.Name = "HeaderFix"
-HeaderFix.Size = UDim2.new(1, 0, 0.5, 0)
-HeaderFix.Position = UDim2.new(0, 0, 0.5, 0)
-HeaderFix.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
-HeaderFix.BorderSizePixel = 0
-HeaderFix.ZIndex = 0
-HeaderFix.Parent = Header
-
-local UIGradient = Instance.new("UIGradient")
-UIGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(45, 45, 65)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 35, 50))
-})
-UIGradient.Rotation = 90
-UIGradient.Parent = Header
 
 local Title = Instance.new("TextLabel")
 Title.Name = "Title"
 Title.Size = UDim2.new(1, -60, 1, 0)
 Title.Position = UDim2.new(0, 15, 0, 0)
 Title.BackgroundTransparency = 1
-Title.Text = "✨ WISL SCRIPT ✨"
+Title.Text = "✨ WISL Script Selector ✨"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 22
 Title.Font = Enum.Font.GothamBold
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = Header
-
-local TitleGlow = Instance.new("ImageLabel")
-TitleGlow.Name = "Glow"
-TitleGlow.BackgroundTransparency = 1
-TitleGlow.Position = UDim2.new(0, -10, 0, -10)
-TitleGlow.Size = UDim2.new(1, 20, 1, 20)
-TitleGlow.ZIndex = 0
-TitleGlow.Image = "rbxassetid://5028857084"
-TitleGlow.ImageColor3 = Color3.fromRGB(100, 100, 255)
-TitleGlow.ImageTransparency = 0.8
-TitleGlow.Parent = Title
 
 local CloseButton = Instance.new("TextButton")
 CloseButton.Name = "CloseButton"
@@ -98,7 +76,7 @@ CloseButton.AutoButtonColor = false
 CloseButton.Parent = Header
 
 local CloseCorner = Instance.new("UICorner")
-CloseCorner.CornerRadius = UDim.new(1, 0) 
+CloseCorner.CornerRadius = UDim.new(1, 0)
 CloseCorner.Parent = CloseButton
 
 local ContentFrame = Instance.new("Frame")
@@ -113,7 +91,7 @@ VersionLabel.Name = "VersionLabel"
 VersionLabel.Size = UDim2.new(1, 0, 0, 20)
 VersionLabel.Position = UDim2.new(0, 0, 1, -25)
 VersionLabel.BackgroundTransparency = 1
-VersionLabel.Text = "v1.0.0"
+VersionLabel.Text = "v1.1.5"
 VersionLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
 VersionLabel.TextSize = 14
 VersionLabel.Font = Enum.Font.Gotham
@@ -211,19 +189,9 @@ local function createStylishButton(name, position, color, icon)
     return Button
 end
 
-local OldButton = createStylishButton("OLD VERSION // NO UPDATE", UDim2.new(0, 0, 0, 0), Color3.fromRGB(80, 80, 180), "🕰️")
-local NewButton = createStylishButton("NEW VERSION Release ", UDim2.new(0, 0, 0, 70), Color3.fromRGB(80, 180, 80), "✨")
-local MobileButton = createStylishButton("Mobile VERSION", UDim2.new(0, 0, 0, 140), Color3.fromRGB(100, 180, 200), "📱")
-local ThaiButton = createStylishButton("THAI VERSION", UDim2.new(0, 0, 0, 210), Color3.fromRGB(80, 180, 180), "🇹🇭")
-
-OldButton.MouseButton1Click:Connect(function()
-    TweenService:Create(MainFrame, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play()
-    TweenService:Create(Shadow, TweenInfo.new(0.3), {ImageTransparency = 1}):Play()
-    wait(0.3)
-    
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/wisl884/wisl-i-Universal-Project1/refs/heads/main/Wisl%20Universal%20Project%20OLD.lua", true))()
-    ScreenGui:Destroy()
-end)
+local NewButton = createStylishButton("Wisl Uni VERSION Release", UDim2.new(0, 0, 0, 0), Color3.fromRGB(80, 180, 80), "✨")
+local MobileButton = createStylishButton("Mobile VERSION", UDim2.new(0, 0, 0, 70), Color3.fromRGB(100, 180, 200), "📱")
+local ThaiButton = createStylishButton("THAI VERSION", UDim2.new(0, 0, 0, 140), Color3.fromRGB(80, 180, 180), "🇹🇭")
 
 NewButton.MouseButton1Click:Connect(function()
     TweenService:Create(MainFrame, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play()
@@ -311,4 +279,4 @@ TweenService:Create(Shadow, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.Easin
 
 MainFrame.Position = UDim2.new(0.5, -160, 0.5, -200)
 wait(0.1)
-TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -160, 0.5, -180)}):Play()
+TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -160, 0.5, -150)}):Play()
