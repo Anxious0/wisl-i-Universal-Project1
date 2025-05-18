@@ -9,7 +9,7 @@ ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 320, 0, 240)
+MainFrame.Size = UDim2.new(0, 320, 0, 320)
 MainFrame.Position = UDim2.new(0.5, -160, 0.5, -150)
 MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 MainFrame.BorderSizePixel = 0
@@ -189,8 +189,10 @@ local function createStylishButton(name, position, color, icon)
     return Button
 end
 
-local NewButton = createStylishButton("Wisl Uni VERSION Release", UDim2.new(0, 0, 0, 0), Color3.fromRGB(80, 180, 80), "✨")
+local NewButton = createStylishButton("Wisl Pc VERSION", UDim2.new(0, 0, 0, 0), Color3.fromRGB(80, 180, 80), "✨")
 local ThaiButton = createStylishButton("THAI VERSION", UDim2.new(0, 0, 0, 70), Color3.fromRGB(80, 180, 180), "🇹🇭")
+local MobileButton = createStylishButton("Mobile VERSION", UDim2.new(0, 0, 0, 140), Color3.fromRGB(90, 112, 172), "📱")
+
 
 NewButton.MouseButton1Click:Connect(function()
     TweenService:Create(MainFrame, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play()
@@ -207,6 +209,15 @@ ThaiButton.MouseButton1Click:Connect(function()
     wait(0.3)
     
     loadstring(game:HttpGet("https://raw.githubusercontent.com/wisl884/wisl-i-Universal-Project1/refs/heads/main/Wisl'i%20Universal%20Project%20Thai%20.lua", true))()
+    ScreenGui:Destroy()
+end)
+
+MobileButton.MouseButton1Click:Connect(function()
+    TweenService:Create(MainFrame, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play()
+    TweenService:Create(Shadow, TweenInfo.new(0.3), {ImageTransparency = 1}):Play()
+    wait(0.3)
+    
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/wisl884/wisl-i-Universal-Project1/refs/heads/main/Wisl%20Universal%20Project%20Mobile.lua", true))()
     ScreenGui:Destroy()
 end)
 
