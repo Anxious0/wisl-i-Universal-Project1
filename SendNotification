@@ -1,4 +1,3 @@
-
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
@@ -6,399 +5,481 @@ local RunService = game:GetService("RunService")
 
 local function createNotification()
     local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "EnhancedNotification"
+    screenGui.Name = "CyberpunkNotification"
     screenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
     screenGui.IgnoreGuiInset = true
-
+    screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    
     local bloom = Instance.new("BloomEffect")
     bloom.Intensity = 0
     bloom.Size = 0
-    bloom.Threshold = 0.85
+    bloom.Threshold = 0.8
     bloom.Parent = Lighting
-
-    local blur = Instance.new("BlurEffect")
-    blur.Size = 0
-    blur.Parent = Lighting
-
+    
     local colorCorrection = Instance.new("ColorCorrectionEffect")
     colorCorrection.Brightness = 0
     colorCorrection.Contrast = 0
     colorCorrection.Saturation = 0
+    colorCorrection.TintColor = Color3.fromRGB(255, 255, 255)
     colorCorrection.Parent = Lighting
-
-    local container = Instance.new("Frame")
-    container.Name = "Container"
-    container.Size = UDim2.new(0, 0, 0, 0)
-    container.Position = UDim2.new(0.5, 0, 0.5, 0)
-    container.AnchorPoint = Vector2.new(0.5, 0.5)
-    container.BackgroundColor3 = Color3.fromRGB(36, 40, 60)
-    container.BackgroundTransparency = 0.6
-    container.BorderSizePixel = 0
-    container.ZIndex = 2
-    container.Parent = screenGui
-
-    local glassLayer = Instance.new("Frame")
-    glassLayer.Size = UDim2.new(1, 0, 1, 0)
-    glassLayer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    glassLayer.BackgroundTransparency = 0.85
-    glassLayer.ZIndex = 3
-    glassLayer.Parent = container
-
-    local reflection = Instance.new("ImageLabel")
-    reflection.BackgroundTransparency = 1
-    reflection.Image = "rbxassetid://7733964646" 
-    reflection.Size = UDim2.new(1.1, 0, 0.5, 0)
-    reflection.Position = UDim2.new(-0.05, 0, -0.15, 0)
-    reflection.ImageTransparency = 0.88
-    reflection.ZIndex = 4
-    reflection.Parent = container
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 36)
-    corner.Parent = container
-
-    local glassCorner = corner:Clone()
-    glassCorner.Parent = glassLayer
-
-    local reflectionCorner = corner:Clone()
-    reflectionCorner.Parent = reflection
-
-    local stroke = Instance.new("UIStroke")
-    stroke.Thickness = 4
-    stroke.Color = Color3.fromRGB(120, 80, 255)
-    stroke.Transparency = 1
-    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    stroke.Parent = container
-
-    local gradient = Instance.new("UIGradient")
-    gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 180, 255)),    
-        ColorSequenceKeypoint.new(0.3, Color3.fromRGB(160, 120, 255)), 
-        ColorSequenceKeypoint.new(0.7, Color3.fromRGB(255, 120, 220)), 
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 180, 120))    
-    })
-    gradient.Rotation = 60
-    gradient.Parent = stroke
-
-    local function createGlow(size, color, transparency, z)
-        local glow = Instance.new("ImageLabel")
-        glow.BackgroundTransparency = 1
-        glow.Size = size
-        glow.Position = UDim2.new(0.5, 0, 0.5, 0)
-        glow.AnchorPoint = Vector2.new(0.5, 0.5)
-        glow.Image = "rbxassetid://6026984224"
-        glow.ImageColor3 = color
-        glow.ImageTransparency = transparency
-        glow.ZIndex = z or 1
-        glow.Parent = container
-        return glow
+    
+    local viewportFrame = Instance.new("ViewportFrame")
+    viewportFrame.Name = "ViewportContainer"
+    viewportFrame.Size = UDim2.new(0, 0, 0, 0)
+    viewportFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    viewportFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    viewportFrame.BackgroundTransparency = 1
+    viewportFrame.LightColor = Color3.fromRGB(0, 170, 255)
+    viewportFrame.LightDirection = Vector3.new(0, -1, 0)
+    viewportFrame.CurrentCamera = Instance.new("Camera")
+    viewportFrame.Parent = screenGui
+    
+    local hexFrame = Instance.new("ImageLabel")
+    hexFrame.Name = "HexagonalFrame"
+    hexFrame.Size = UDim2.new(0.5, 0, 0.25, 0)
+    hexFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    hexFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    hexFrame.BackgroundTransparency = 1
+    hexFrame.Image = "rbxassetid://9122042332"
+    hexFrame.ImageColor3 = Color3.fromRGB(20, 20, 30)
+    hexFrame.ImageTransparency = 1
+    hexFrame.ScaleType = Enum.ScaleType.Slice
+    hexFrame.SliceCenter = Rect.new(100, 100, 100, 100)
+    hexFrame.ZIndex = 2
+    hexFrame.Parent = screenGui
+    
+    local neonBorder = Instance.new("ImageLabel")
+    neonBorder.Name = "NeonBorder"
+    neonBorder.Size = UDim2.new(1.03, 0, 1.05, 0)
+    neonBorder.Position = UDim2.new(0.5, 0, 0.5, 0)
+    neonBorder.AnchorPoint = Vector2.new(0.5, 0.5)
+    neonBorder.BackgroundTransparency = 1
+    neonBorder.Image = "rbxassetid://9122042332"
+    neonBorder.ImageColor3 = Color3.fromRGB(0, 200, 255)
+    neonBorder.ImageTransparency = 1
+    neonBorder.ScaleType = Enum.ScaleType.Slice
+    neonBorder.SliceCenter = Rect.new(100, 100, 100, 100)
+    neonBorder.ZIndex = 1
+    neonBorder.Parent = hexFrame
+    
+    local innerGlow = Instance.new("ImageLabel")
+    innerGlow.Name = "InnerGlow"
+    innerGlow.Size = UDim2.new(0.97, 0, 0.94, 0)
+    innerGlow.Position = UDim2.new(0.5, 0, 0.5, 0)
+    innerGlow.AnchorPoint = Vector2.new(0.5, 0.5)
+    innerGlow.BackgroundTransparency = 1
+    innerGlow.Image = "rbxassetid://9122042332"
+    innerGlow.ImageColor3 = Color3.fromRGB(0, 150, 255)
+    innerGlow.ImageTransparency = 1
+    innerGlow.ScaleType = Enum.ScaleType.Slice
+    innerGlow.SliceCenter = Rect.new(100, 100, 100, 100)
+    innerGlow.ZIndex = 3
+    innerGlow.Parent = hexFrame
+    
+    local holoEffect = Instance.new("ImageLabel")
+    holoEffect.Name = "HolographicEffect"
+    holoEffect.Size = UDim2.new(1, 0, 1, 0)
+    holoEffect.Position = UDim2.new(0.5, 0, 0.5, 0)
+    holoEffect.AnchorPoint = Vector2.new(0.5, 0.5)
+    holoEffect.BackgroundTransparency = 1
+    holoEffect.Image = "rbxassetid://8998085564"
+    holoEffect.ImageColor3 = Color3.fromRGB(0, 200, 255)
+    holoEffect.ImageTransparency = 1
+    holoEffect.ZIndex = 4
+    holoEffect.Parent = hexFrame
+    
+    local scanlines = Instance.new("ImageLabel")
+    scanlines.Name = "Scanlines"
+    scanlines.Size = UDim2.new(1, 0, 1, 0)
+    scanlines.Position = UDim2.new(0.5, 0, 0.5, 0)
+    scanlines.AnchorPoint = Vector2.new(0.5, 0.5)
+    scanlines.BackgroundTransparency = 1
+    scanlines.Image = "rbxassetid://6764061386"
+    scanlines.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    scanlines.ImageTransparency = 1
+    scanlines.ZIndex = 5
+    scanlines.Parent = hexFrame
+    
+    local glitchFrame = Instance.new("Frame")
+    glitchFrame.Name = "GlitchFrame"
+    glitchFrame.Size = UDim2.new(1, 0, 1, 0)
+    glitchFrame.BackgroundTransparency = 1
+    glitchFrame.ZIndex = 6
+    glitchFrame.ClipsDescendants = true
+    glitchFrame.Parent = hexFrame
+    
+    for i = 1, 5 do
+        local glitchElement = Instance.new("Frame")
+        glitchElement.Name = "GlitchElement" .. i
+        glitchElement.Size = UDim2.new(0.1, 0, 0.05, 0)
+        glitchElement.Position = UDim2.new(math.random(), 0, math.random(), 0)
+        glitchElement.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+        glitchElement.BackgroundTransparency = 1
+        glitchElement.ZIndex = 7
+        glitchElement.Parent = glitchFrame
     end
-
-    local glows = {
-        createGlow(UDim2.new(2.7, 0, 2.7, 0), Color3.fromRGB(120, 80, 255), 0.88, 1),
-        createGlow(UDim2.new(2.2, 0, 2.2, 0), Color3.fromRGB(80, 180, 255), 0.92, 1),
-        createGlow(UDim2.new(1.7, 0, 1.7, 0), Color3.fromRGB(255, 120, 220), 0.96, 1)
-    }
-
-    local icon = Instance.new("TextLabel")
-    icon.Name = "Icon"
-    icon.Size = UDim2.new(0, 80, 0, 80)
-    icon.Position = UDim2.new(0.5, 0, 0.18, 0)
-    icon.AnchorPoint = Vector2.new(0.5, 0.5)
-    icon.BackgroundTransparency = 1
-    icon.Text = "UwU"
-    icon.TextColor3 = Color3.fromRGB(255, 255, 255)
-    icon.Font = Enum.Font.FredokaOne
-    icon.TextSize = 72
-    icon.TextTransparency = 1
-    icon.ZIndex = 5
-    icon.Parent = container
-
-    local iconGradient = Instance.new("UIGradient")
-    iconGradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 180, 255)),    
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(160, 120, 255)), 
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 120, 220))    
-    })
-    iconGradient.Rotation = 45
-    iconGradient.Parent = icon
-
-    local iconStroke = Instance.new("UIStroke")
-    iconStroke.Color = Color3.fromRGB(255, 255, 255)
-    iconStroke.Thickness = 2
-    iconStroke.Transparency = 0.3
-    iconStroke.Parent = icon
-
+    
+    local logo = Instance.new("ImageLabel")
+    logo.Name = "CyberpunkLogo"
+    logo.Size = UDim2.new(0, 80, 0, 80)
+    logo.Position = UDim2.new(0.5, 0, 0.2, 0)
+    logo.AnchorPoint = Vector2.new(0.5, 0.5)
+    logo.BackgroundTransparency = 1
+    logo.Image = "rbxassetid://6764472516"
+    logo.ImageColor3 = Color3.fromRGB(255, 80, 80)
+    logo.ImageTransparency = 1
+    logo.ZIndex = 8
+    logo.Parent = hexFrame
+    
     local title = Instance.new("TextLabel")
     title.Name = "Title"
-    title.Size = UDim2.new(0.9, 0, 0, 38)
-    title.Position = UDim2.new(0.5, 0, 0.38, 0)
+    title.Size = UDim2.new(0.9, 0, 0, 40)
+    title.Position = UDim2.new(0.5, 0, 0.4, 0)
     title.AnchorPoint = Vector2.new(0.5, 0)
     title.BackgroundTransparency = 1
-    title.Text = "✨ Welcome"
-    title.TextColor3 = Color3.fromRGB(255, 255, 255)
-    title.TextStrokeColor3 = Color3.fromRGB(120, 60, 180)
-    title.TextStrokeTransparency = 0.7
-    title.Font = Enum.Font.GothamBlack
+    title.Text = "SYSTEM ALERT"
+    title.TextColor3 = Color3.fromRGB(0, 255, 255)
+    title.Font = Enum.Font.Gotham
     title.TextSize = 32
     title.TextTransparency = 1
-    title.ZIndex = 6
-    title.Parent = container
-
-    local text = Instance.new("TextLabel")
-    text.Name = "Message"
-    text.Size = UDim2.new(0.85, 0, 0, 32)
-    text.Position = UDim2.new(0.5, 0, 0.60, 0)
-    text.AnchorPoint = Vector2.new(0.5, 0)
-    text.BackgroundTransparency = 1
-    text.Text = "You are in Script wisI'i Universal Project"
-    text.TextColor3 = Color3.fromRGB(255, 255, 255)
-    text.TextStrokeColor3 = Color3.fromRGB(80, 40, 120)
-    text.TextStrokeTransparency = 0.7
-    text.Font = Enum.Font.FredokaOne
-    text.TextSize = 26
-    text.TextTransparency = 1
-    text.ZIndex = 6
-    text.Parent = container
-
+    title.ZIndex = 9
+    title.Parent = hexFrame
+    
+    local titleStroke = Instance.new("UIStroke")
+    titleStroke.Color = Color3.fromRGB(0, 255, 255)
+    titleStroke.Thickness = 2
+    titleStroke.Transparency = 1
+    titleStroke.Parent = title
+    
+    local message = Instance.new("TextLabel")
+    message.Name = "Message"
+    message.Size = UDim2.new(0.85, 0, 0, 60)
+    message.Position = UDim2.new(0.5, 0, 0.6, 0)
+    message.AnchorPoint = Vector2.new(0.5, 0)
+    message.BackgroundTransparency = 1
+    message.Text = "ACCESS GRANTED: WISI'S UNIVERSAL PROJECT"
+    message.TextColor3 = Color3.fromRGB(255, 255, 255)
+    message.Font = Enum.Font.Code
+    message.TextSize = 24
+    message.TextTransparency = 1
+    message.TextWrapped = true
+    message.ZIndex = 9
+    message.Parent = hexFrame
+    
+    local typingContainer = Instance.new("Frame")
+    typingContainer.Name = "TypingContainer"
+    typingContainer.Size = UDim2.new(0.85, 0, 0, 20)
+    typingContainer.Position = UDim2.new(0.5, 0, 0.85, 0)
+    typingContainer.AnchorPoint = Vector2.new(0.5, 0)
+    typingContainer.BackgroundTransparency = 1
+    typingContainer.ZIndex = 9
+    typingContainer.Parent = hexFrame
+    
+    local loadingBar = Instance.new("Frame")
+    loadingBar.Name = "LoadingBar"
+    loadingBar.Size = UDim2.new(0, 0, 0, 4)
+    loadingBar.Position = UDim2.new(0, 0, 0, 0)
+    loadingBar.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+    loadingBar.BorderSizePixel = 0
+    loadingBar.ZIndex = 10
+    loadingBar.Parent = typingContainer
+    
+    local loadingGlow = Instance.new("ImageLabel")
+    loadingGlow.Name = "LoadingGlow"
+    loadingGlow.Size = UDim2.new(1, 0, 3, 0)
+    loadingGlow.Position = UDim2.new(0.5, 0, 0.5, 0)
+    loadingGlow.AnchorPoint = Vector2.new(0.5, 0.5)
+    loadingGlow.BackgroundTransparency = 1
+    loadingGlow.Image = "rbxassetid://6026568215"
+    loadingGlow.ImageColor3 = Color3.fromRGB(255, 80, 80)
+    loadingGlow.ImageTransparency = 0.5
+    loadingGlow.ZIndex = 9
+    loadingGlow.Parent = loadingBar
+    
+    local circuitPattern = Instance.new("ImageLabel")
+    circuitPattern.Name = "CircuitPattern"
+    circuitPattern.Size = UDim2.new(1, 0, 1, 0)
+    circuitPattern.Position = UDim2.new(0.5, 0, 0.5, 0)
+    circuitPattern.AnchorPoint = Vector2.new(0.5, 0.5)
+    circuitPattern.BackgroundTransparency = 1
+    circuitPattern.Image = "rbxassetid://6764079483"
+    circuitPattern.ImageColor3 = Color3.fromRGB(0, 200, 255)
+    circuitPattern.ImageTransparency = 1
+    circuitPattern.ZIndex = 11
+    circuitPattern.Parent = hexFrame
+    
     local particleFrame = Instance.new("Frame")
+    particleFrame.Name = "ParticleFrame"
     particleFrame.Size = UDim2.new(1, 0, 1, 0)
     particleFrame.BackgroundTransparency = 1
-    particleFrame.ZIndex = 7
-    particleFrame.Parent = container
-
-    local particles = Instance.new("ParticleEmitter")
-    particles.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 180, 255)),
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(160, 120, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 120, 220))
+    particleFrame.ZIndex = 12
+    particleFrame.Parent = hexFrame
+    
+    local dataParticles = Instance.new("ParticleEmitter")
+    dataParticles.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 255, 255)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(80, 170, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 80, 255))
     })
-    particles.Transparency = NumberSequence.new({
-        NumberSequenceKeypoint.new(0, 0.3),
-        NumberSequenceKeypoint.new(0.7, 0.8),
+    dataParticles.Transparency = NumberSequence.new({
+        NumberSequenceKeypoint.new(0, 0.8),
+        NumberSequenceKeypoint.new(0.7, 0.9),
         NumberSequenceKeypoint.new(1, 1)
     })
-    particles.Size = NumberSequence.new({
-        NumberSequenceKeypoint.new(0, 0.25),
-        NumberSequenceKeypoint.new(0.5, 0.12),
-        NumberSequenceKeypoint.new(1, 0)
-    })
-    particles.Lifetime = NumberRange.new(1.2, 2.2)
-    particles.Rate = 60
-    particles.Speed = NumberRange.new(7, 11)
-    particles.SpreadAngle = Vector2.new(-360, 360)
-    particles.Rotation = NumberRange.new(0, 360)
-    particles.Parent = particleFrame
-
-    local burstFrame = Instance.new("Frame")
-    burstFrame.Size = UDim2.new(1, 0, 1, 0)
-    burstFrame.BackgroundTransparency = 1
-    burstFrame.ZIndex = 10
-    burstFrame.Parent = container
-
-    local burst = Instance.new("ParticleEmitter")
-    burst.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 120, 220)),
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(160, 120, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(80, 180, 255))
-    })
-    burst.Transparency = NumberSequence.new({
+    dataParticles.Size = NumberSequence.new({
         NumberSequenceKeypoint.new(0, 0.2),
-        NumberSequenceKeypoint.new(0.7, 0.8),
-        NumberSequenceKeypoint.new(1, 1)
-    })
-    burst.Size = NumberSequence.new({
-        NumberSequenceKeypoint.new(0, 0.35),
-        NumberSequenceKeypoint.new(0.5, 0.18),
+        NumberSequenceKeypoint.new(0.5, 0.1),
         NumberSequenceKeypoint.new(1, 0)
     })
-    burst.Lifetime = NumberRange.new(0.7, 1.2)
-    burst.Rate = 0
-    burst.Speed = NumberRange.new(18, 28)
-    burst.SpreadAngle = Vector2.new(-360, 360)
-    burst.Rotation = NumberRange.new(0, 360)
-    burst.Parent = burstFrame
-
-    local sound = Instance.new("Sound")
-    sound.SoundId = "rbxassetid://6026984224"
-    sound.Volume = 0.7
-    sound.Parent = container
-
-    local popSound = Instance.new("Sound")
-    popSound.SoundId = "rbxassetid://9118828562" 
-    popSound.Volume = 1
-    popSound.Parent = container
-
+    dataParticles.Lifetime = NumberRange.new(1, 2)
+    dataParticles.Rate = 0
+    dataParticles.Speed = NumberRange.new(10, 20)
+    dataParticles.SpreadAngle = Vector2.new(-180, 180)
+    dataParticles.Parent = particleFrame
+    
+    local bootupSound = Instance.new("Sound")
+    bootupSound.SoundId = "rbxassetid://9125405693"
+    bootupSound.Volume = 0.8
+    bootupSound.Parent = screenGui
+    
+    local glitchSound = Instance.new("Sound")
+    glitchSound.SoundId = "rbxassetid://9125504957"
+    glitchSound.Volume = 0.5
+    glitchSound.Parent = screenGui
+    
+    local shutdownSound = Instance.new("Sound")
+    shutdownSound.SoundId = "rbxassetid://9125623156"
+    shutdownSound.Volume = 0.8
+    shutdownSound.Parent = screenGui
+    
     return {
         ScreenGui = screenGui,
-        Container = container,
-        GlassLayer = glassLayer,
-        Reflection = reflection,
-        Icon = icon,
+        HexFrame = hexFrame,
+        NeonBorder = neonBorder,
+        InnerGlow = innerGlow,
+        HoloEffect = holoEffect,
+        Scanlines = scanlines,
+        GlitchFrame = glitchFrame,
+        GlitchElements = glitchFrame:GetChildren(),
+        Logo = logo,
         Title = title,
-        Text = text,
-        Blur = blur,
+        TitleStroke = titleStroke,
+        Message = message,
+        LoadingBar = loadingBar,
+        CircuitPattern = circuitPattern,
+        DataParticles = dataParticles,
+        BootupSound = bootupSound,
+        GlitchSound = glitchSound,
+        ShutdownSound = shutdownSound,
         Bloom = bloom,
         ColorCorrection = colorCorrection,
-        Glows = glows,
-        Stroke = stroke,
-        Gradient = gradient,
-        Particles = particles,
-        Burst = burst,
-        BurstFrame = burstFrame,
-        Sound = sound,
-        PopSound = popSound,
-        LightingEffects = {bloom, blur, colorCorrection},
+        LightingEffects = {bloom, colorCorrection}
     }
 end
 
 local function animateNotification(elements, duration)
-    elements.Sound:Play()
-
-    elements.Container.Size = UDim2.new(0, 0, 0, 0)
-    elements.Container.BackgroundTransparency = 1
-    elements.Icon.TextTransparency = 1
+    elements.BootupSound:Play()
+    
+    elements.HexFrame.ImageTransparency = 1
+    elements.NeonBorder.ImageTransparency = 1
+    elements.InnerGlow.ImageTransparency = 1
+    elements.HoloEffect.ImageTransparency = 1
+    elements.Scanlines.ImageTransparency = 1
+    elements.Logo.ImageTransparency = 1
     elements.Title.TextTransparency = 1
-    elements.Text.TextTransparency = 1
-
-    local floating = true
-    local floatConn
-    local floatStart = tick()
-    floatConn = RunService.RenderStepped:Connect(function()
-        if not floating then floatConn:Disconnect() return end
-        local t = tick() - floatStart
-        local offset = math.sin(t * 2) * 6
-        elements.Container.Position = UDim2.new(0.5, 0, 0.5, offset)
-    end)
-
-    local entranceTweens = {
-        TweenService:Create(elements.Container, TweenInfo.new(0.8, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0.45, 0, 0.22, 0),
-            BackgroundTransparency = 0.6
-        }),
-        TweenService:Create(elements.GlassLayer, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {
-            BackgroundTransparency = 0.85
-        }),
-        TweenService:Create(elements.Icon, TweenInfo.new(0.7, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0.2), {
-            TextTransparency = 0
-        }),
-        TweenService:Create(elements.Title, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0.25), {
-            TextTransparency = 0
-        }),
-        TweenService:Create(elements.Text, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0.35), {
-            TextTransparency = 0
-        }),
-        TweenService:Create(elements.Blur, TweenInfo.new(0.8), {
-            Size = 24
-        }),
-        TweenService:Create(elements.Bloom, TweenInfo.new(0.8), {
-            Intensity = 1.5,
-            Size = 72
-        }),
-        TweenService:Create(elements.ColorCorrection, TweenInfo.new(0.8), {
-            Brightness = 0.08,
-            Saturation = 0.12
-        }),
-        TweenService:Create(elements.Stroke, TweenInfo.new(0.8), {
-            Transparency = 0
-        }),
-        TweenService:Create(elements.Reflection, TweenInfo.new(1.2, Enum.EasingStyle.Sine), {
-            ImageTransparency = 0.88
-        })
-    }
-
-    for i, glow in ipairs(elements.Glows) do
-        table.insert(entranceTweens, TweenService:Create(glow, TweenInfo.new(1, Enum.EasingStyle.Cubic), {
-            ImageTransparency = glow.ImageTransparency - 0.4,
-            Rotation = 180 * (i % 2 == 0 and 1 or -1)
-        }))
+    elements.TitleStroke.Transparency = 1
+    elements.Message.TextTransparency = 1
+    elements.CircuitPattern.ImageTransparency = 1
+    
+    for _, glitchElement in ipairs(elements.GlitchElements) do
+        glitchElement.BackgroundTransparency = 1
     end
-
-    local gradientTween = TweenService:Create(elements.Gradient, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
-        Rotation = elements.Gradient.Rotation + 360
-    })
-    gradientTween:Play()
-
-    local function pulseEffect()
-        for i = 1, math.floor(duration) do
-            local pulseTween = TweenService:Create(elements.Container, TweenInfo.new(0.6, Enum.EasingStyle.Sine), {
-                Size = UDim2.new(0.47, 0, 0.23, 0)
-            })
-            local pulseBack = TweenService:Create(elements.Container, TweenInfo.new(0.6, Enum.EasingStyle.Sine), {
-                Size = UDim2.new(0.45, 0, 0.22, 0)
-            })
-            pulseTween:Play()
-            pulseTween.Completed:Wait()
-            pulseBack:Play()
-            pulseBack.Completed:Wait()
+    
+    local function glitchEffect()
+        while elements.ScreenGui.Parent do
+            if math.random() < 0.3 then
+                elements.GlitchSound:Play()
+                
+                for _, glitchElement in ipairs(elements.GlitchElements) do
+                    glitchElement.Position = UDim2.new(math.random(), 0, math.random(), 0)
+                    glitchElement.Size = UDim2.new(math.random(5, 20)/100, 0, math.random(2, 8)/100, 0)
+                    glitchElement.BackgroundTransparency = math.random(2, 7)/10
+                    
+                    local glitchTween = TweenService:Create(glitchElement, TweenInfo.new(0.1), {
+                        BackgroundTransparency = 1
+                    })
+                    glitchTween:Play()
+                end
+                
+                local originalText = elements.Title.Text
+                elements.Title.Text = string.gsub(originalText, ".", function(c)
+                    if math.random() < 0.3 then
+                        local chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+"
+                        return string.sub(chars, math.random(1, #chars), math.random(1, #chars))
+                    else
+                        return c
+                    end
+                end)
+                
+                task.delay(0.2, function()
+                    elements.Title.Text = originalText
+                end)
+                
+                local scanlineTween = TweenService:Create(elements.Scanlines, TweenInfo.new(0.1), {
+                    ImageTransparency = 0.7
+                })
+                scanlineTween:Play()
+                
+                task.delay(0.2, function()
+                    local scanlineResetTween = TweenService:Create(elements.Scanlines, TweenInfo.new(0.1), {
+                        ImageTransparency = 0.9
+                    })
+                    scanlineResetTween:Play()
+                end)
+            end
+            
+            task.wait(math.random(5, 15)/10)
         end
     end
-
+    
+    local function typingEffect(text, textLabel)
+        local originalText = text
+        textLabel.Text = ""
+        
+        for i = 1, #originalText do
+            if elements.ScreenGui.Parent then
+                textLabel.Text = string.sub(originalText, 1, i)
+                task.wait(math.random(1, 5) / 100)
+            else
+                break
+            end
+        end
+    end
+    
+    local entranceTweens = {
+        TweenService:Create(elements.HexFrame, TweenInfo.new(0.8, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            ImageTransparency = 0.1
+        }),
+        TweenService:Create(elements.NeonBorder, TweenInfo.new(1.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            ImageTransparency = 0.2
+        }),
+        TweenService:Create(elements.InnerGlow, TweenInfo.new(1.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            ImageTransparency = 0.7
+        }),
+        TweenService:Create(elements.HoloEffect, TweenInfo.new(1.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            ImageTransparency = 0.8
+        }),
+        TweenService:Create(elements.Scanlines, TweenInfo.new(2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            ImageTransparency = 0.9
+        }),
+        TweenService:Create(elements.Logo, TweenInfo.new(1.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            ImageTransparency = 0
+        }),
+        TweenService:Create(elements.TitleStroke, TweenInfo.new(1.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Transparency = 0
+        }),
+        TweenService:Create(elements.CircuitPattern, TweenInfo.new(2.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            ImageTransparency = 0.85
+        }),
+        TweenService:Create(elements.Bloom, TweenInfo.new(1.5), {
+            Intensity = 0.8,
+            Size = 40
+        }),
+        TweenService:Create(elements.ColorCorrection, TweenInfo.new(1.5), {
+            Brightness = 0.05,
+            Contrast = 0.1,
+            Saturation = 0.2,
+            TintColor = Color3.fromRGB(200, 240, 255)
+        })
+    }
+    
+    task.spawn(glitchEffect)
+    
     for _, tween in ipairs(entranceTweens) do
         tween:Play()
     end
-    task.spawn(pulseEffect)
-    task.wait(duration)
-
-    floating = false
-    elements.Burst:Emit(32)
-    elements.PopSound:Play()
-
+    
+    task.wait(1)
+    
+    elements.Title.TextTransparency = 0
+    typingEffect("SYSTEM ALERT", elements.Title)
+    
+    task.wait(0.5)
+    
+    elements.Message.TextTransparency = 0
+    typingEffect("ACCESS GRANTED: WISI'S UNIVERSAL PROJECT", elements.Message)
+    
+    local loadingTween = TweenService:Create(elements.LoadingBar, TweenInfo.new(duration - 2, Enum.EasingStyle.Linear), {
+        Size = UDim2.new(1, 0, 0, 4)
+    })
+    loadingTween:Play()
+    
+    elements.DataParticles.Rate = 30
+    
+    task.wait(duration - 1)
+    
+    elements.ShutdownSound:Play()
+    
+    elements.DataParticles.Rate = 0
+    
     local exitTweens = {
-        TweenService:Create(elements.Container, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
-            Size = UDim2.new(0.55, 0, 0.27, 0),
+        TweenService:Create(elements.HexFrame, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            ImageTransparency = 1
+        }),
+        TweenService:Create(elements.NeonBorder, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            ImageTransparency = 1
+        }),
+        TweenService:Create(elements.InnerGlow, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            ImageTransparency = 1
+        }),
+        TweenService:Create(elements.HoloEffect, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            ImageTransparency = 1
+        }),
+        TweenService:Create(elements.Scanlines, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            ImageTransparency = 1
+        }),
+        TweenService:Create(elements.Logo, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            ImageTransparency = 1
+        }),
+        TweenService:Create(elements.Title, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            TextTransparency = 1
+        }),
+        TweenService:Create(elements.TitleStroke, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            Transparency = 1
+        }),
+        TweenService:Create(elements.Message, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            TextTransparency = 1
+        }),
+        TweenService:Create(elements.CircuitPattern, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            ImageTransparency = 1
+        }),
+        TweenService:Create(elements.LoadingBar, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
             BackgroundTransparency = 1
         }),
-        TweenService:Create(elements.GlassLayer, TweenInfo.new(0.5), {
-            BackgroundTransparency = 1
-        }),
-        TweenService:Create(elements.Icon, TweenInfo.new(0.4), {
-            TextTransparency = 1
-        }),
-        TweenService:Create(elements.Title, TweenInfo.new(0.4), {
-            TextTransparency = 1
-        }),
-        TweenService:Create(elements.Text, TweenInfo.new(0.4), {
-            TextTransparency = 1
-        }),
-        TweenService:Create(elements.Blur, TweenInfo.new(0.5), {
-            Size = 0
-        }),
-        TweenService:Create(elements.Bloom, TweenInfo.new(0.5), {
+        TweenService:Create(elements.Bloom, TweenInfo.new(0.8), {
             Intensity = 0,
             Size = 0
         }),
-        TweenService:Create(elements.ColorCorrection, TweenInfo.new(0.5), {
+        TweenService:Create(elements.ColorCorrection, TweenInfo.new(0.8), {
             Brightness = 0,
-            Saturation = 0
-        }),
-        TweenService:Create(elements.Stroke, TweenInfo.new(0.5), {
-            Transparency = 1
-        }),
-        TweenService:Create(elements.Reflection, TweenInfo.new(0.5), {
-            ImageTransparency = 1
+            Contrast = 0,
+            Saturation = 0,
+            TintColor = Color3.fromRGB(255, 255, 255)
         })
     }
-
-    for _, glow in ipairs(elements.Glows) do
-        table.insert(exitTweens, TweenService:Create(glow, TweenInfo.new(0.5), {
-            ImageTransparency = 1,
-            Rotation = glow.Rotation + 90
-        }))
-    end
-
+    
     for _, tween in ipairs(exitTweens) do
         tween:Play()
     end
-
-    task.wait(0.7)
-    for _, eff in ipairs(elements.LightingEffects) do
-        if eff and eff.Parent then
-            eff:Destroy()
+    
+    task.wait(1)
+    for _, effect in ipairs(elements.LightingEffects) do
+        if effect and effect.Parent then
+            effect:Destroy()
         end
     end
     elements.ScreenGui:Destroy()
 end
 
 local elements = createNotification()
-animateNotification(elements, 4)
+animateNotification(elements, 6)
