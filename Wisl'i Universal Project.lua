@@ -1,88 +1,70 @@
-function CreateWislBasicUI()
-    local old = (game:GetService("CoreGui"):FindFirstChild("WislBasicUI") or (game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("WislBasicUI")))
-    if old then
-        old:Destroy()
-    end
+local function CreateWislUI()
+    local oldUI = game:GetService("CoreGui"):FindFirstChild("WislUI") or game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("WislUI")
+    if oldUI then oldUI:Destroy() end
 
     local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "WislBasicUI"
-    if syn and syn.protect_gui then
-        syn.protect_gui(screenGui)
-        screenGui.Parent = game:GetService("CoreGui")
-    else
-        pcall(function() screenGui.Parent = game:GetService("CoreGui") end)
-        if not screenGui.Parent then
-            screenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
-        end
+    screenGui.Name = "WislUI"
+    screenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(0, 260, 0, 120)
+    mainFrame.Position = UDim2.new(0.5, -130, 0.5, -60)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(30, 32, 36)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.Parent = screenGui
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12)
+    corner.Parent = mainFrame
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 36)
+    title.BackgroundTransparency = 1
+    title.Text = "Wisl Universal"
+    title.TextColor3 = Color3.fromRGB(255,255,255)
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 22
+    title.Parent = mainFrame
+
+    local buttonFrame = Instance.new("Frame")
+    buttonFrame.Size = UDim2.new(1, 0, 1, -36)
+    buttonFrame.Position = UDim2.new(0, 0, 0, 36)
+    buttonFrame.BackgroundTransparency = 1
+    buttonFrame.Parent = mainFrame
+
+    local listLayout = Instance.new("UIListLayout")
+    listLayout.FillDirection = Enum.FillDirection.Vertical
+    listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    listLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    listLayout.Padding = UDim.new(0, 12)
+    listLayout.Parent = buttonFrame
+
+    local function createButton(text, color)
+        local button = Instance.new("TextButton")
+        button.Size = UDim2.new(0.85, 0, 0, 38)
+        button.Text = text
+        button.TextColor3 = Color3.new(1, 1, 1)
+        button.Font = Enum.Font.GothamBold
+        button.TextSize = 18
+        button.BorderSizePixel = 0
+        button.BackgroundColor3 = color
+        button.AutoButtonColor = true
+        button.Parent = buttonFrame
+
+        local btnCorner = Instance.new("UICorner")
+        btnCorner.CornerRadius = UDim.new(0, 8)
+        btnCorner.Parent = button
+
+        return button
     end
 
-    local buttonHolder = Instance.new("Frame")
-    buttonHolder.Size = UDim2.new(0, 220, 0, 150)
-    buttonHolder.Position = UDim2.new(0.5, -110, 0.5, -75)
-    buttonHolder.BackgroundTransparency = 1
-    buttonHolder.BorderSizePixel = 0
-    buttonHolder.Parent = screenGui
-
-    local uiList = Instance.new("UIListLayout")
-    uiList.Parent = buttonHolder
-    uiList.FillDirection = Enum.FillDirection.Vertical
-    uiList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-    uiList.VerticalAlignment = Enum.VerticalAlignment.Center
-    uiList.Padding = UDim.new(0, 14)
-
-    local pcButton = Instance.new("TextButton")
-    pcButton.Size = UDim2.new(1, 0, 0, 40)
-    pcButton.BackgroundColor3 = Color3.fromRGB(66, 135, 245)
-    pcButton.Text = "Wisl Pc"
-    pcButton.TextColor3 = Color3.new(1,1,1)
-    pcButton.Font = Enum.Font.GothamBold
-    pcButton.TextSize = 20
-    pcButton.BorderSizePixel = 0
-    pcButton.AutoButtonColor = true
-    pcButton.Parent = buttonHolder
-
-    local pcCorner = Instance.new("UICorner")
-    pcCorner.CornerRadius = UDim.new(0, 10)
-    pcCorner.Parent = pcButton
-
-    local mobileButton = Instance.new("TextButton")
-    mobileButton.Size = UDim2.new(1, 0, 0, 40)
-    mobileButton.BackgroundColor3 = Color3.fromRGB(76, 175, 80)
-    mobileButton.Text = "Wisl Moblie"
-    mobileButton.TextColor3 = Color3.new(1,1,1)
-    mobileButton.Font = Enum.Font.GothamBold
-    mobileButton.TextSize = 20
-    mobileButton.BorderSizePixel = 0
-    mobileButton.AutoButtonColor = true
-    mobileButton.Parent = buttonHolder
-
-    local mobileCorner = Instance.new("UICorner")
-    mobileCorner.CornerRadius = UDim.new(0, 10)
-    mobileCorner.Parent = mobileButton
-
-    local closeButton = Instance.new("TextButton")
-    closeButton.Size = UDim2.new(1, 0, 0, 36)
-    closeButton.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
-    closeButton.Text = "Close"
-    closeButton.TextColor3 = Color3.new(1,1,1)
-    closeButton.Font = Enum.Font.GothamBold
-    closeButton.TextSize = 18
-    closeButton.BorderSizePixel = 0
-    closeButton.AutoButtonColor = true
-    closeButton.Parent = buttonHolder
-
-    local closeCorner = Instance.new("UICorner")
-    closeCorner.CornerRadius = UDim.new(0, 10)
-    closeCorner.Parent = closeButton
+    local pcButton = createButton("Wisl Pc / Mobile", Color3.fromRGB(66, 135, 245))
+    local closeButton = createButton("Close", Color3.fromRGB(220, 60, 60))
 
     pcButton.MouseButton1Click:Connect(function()
         screenGui:Destroy()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/wisl884/wisl-i-Universal-Project1/refs/heads/main/Wisl'i%20Universal%20Project%20new%20UI.lua", true))()
-    end)
-
-    mobileButton.MouseButton1Click:Connect(function()
-        screenGui:Destroy()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/wisl884/wisl-i-Universal-Project1/refs/heads/main/Wisl%20Universal%20Project%20Mobile.lua", true))()
     end)
 
     closeButton.MouseButton1Click:Connect(function()
@@ -90,4 +72,4 @@ function CreateWislBasicUI()
     end)
 end
 
-CreateWislBasicUI()
+CreateWislUI()
