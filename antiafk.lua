@@ -1,4 +1,3 @@
-local Module = require(game:GetService("Players").LocalPlayer.PlayerScripts.ClientMain.Replications.Workers.WalkDummy)
-setconstant(Module,34,function()
-   game:GetService("RunService").Heartbeat:Wait()
+RunService.Stepped:Connect(function()
+    lp.Character.HumanoidRootPart.CFrame = lp.Character.HumanoidRootPart.CFrame + Vector3.new(0,0.01,0)
 end)
